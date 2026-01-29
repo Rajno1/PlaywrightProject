@@ -1,31 +1,29 @@
 import { Page, Locator } from "@playwright/test";
 
-export class Basepage {
+export class BasePage {
 
-   // protected page: Page;
+  constructor(protected page: Page) {}
 
-    constructor(protected page: Page) {
-        this.page = page;
-    }
-
-    // Cretating a Generic Locator menu function
-
-    menu(menuName: string): Locator {
-        return this.page.locator(`ul.vg-nav-wrapper [aria-label="${menuName}"]`);
-    }
-
-    subMenu(subMenu : string): Locator {
-       return this.page.locator(`[class="left show"]>[aria-label="${subMenu}"]`)
-    }
-
-    async openMenu(menuName: string) {
-    await this.menu(menuName).click();
-}
-
-async openSubMenu(parent: string, child: string) {
-    await this.open(parent);
-    await this.page.locator(`text=${child}`).click();
+  // Generic menu locator function
+  menu(menuName: string): Locator {
+    return this.page.locator(`ul.vg-nav-wrapper [aria-label="${menuName}"]`);
   }
 
-}
+  // Generic sub menu locator function
+  subMenu(subMenuName: string): Locator {
+    return this.page.locator(`.left.show [aria-label="${subMenuName}"]`);
+  }
 
+  async openMenu(menuName: string) {
+    const menu = this.menu(menuName);
+    await menu.waitFor();
+    await menu.click();
+  }
+
+  async openSubMenu(parent: string, child: string) {
+    await this.openMenu(parent);
+    const sub = this.subMenu(child);
+    await sub.waitFor();
+    await sub.click();
+  }
+}
