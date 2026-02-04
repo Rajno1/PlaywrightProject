@@ -1,23 +1,23 @@
 import { Page , Locator} from "@playwright/test";
+import { BasePage } from "./Basepage";
+import { MainMenu } from "../enums/Enum";
 
-export class ProgramsPage {
+export class ProgramsPage extends BasePage{
 
     protected page :Page;
 
   
-    readonly programMenu : Locator;
-
-
-
     constructor(page:Page){
+        super(page)
         this.page=page;
-
-        this.programMenu  = page.locator('ul[class="vg-nav-wrapper"]>li>a[href="/programs"]')
     }
 
 
   // Actions methos 
-  async clickPrograms() {
-    await this.programMenu.click();
-  }
+    async clickOnProgramMenu(){
+      await this.openMenu(MainMenu.PROGRAMS);
+    }
+
+
+
 }

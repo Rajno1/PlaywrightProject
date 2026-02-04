@@ -1,0 +1,96 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e5]:
+    - img "logo" [ref=e7]
+    - generic [ref=e8]:
+      - heading "Grants Management System" [level=4] [ref=e9]
+      - heading [level=5]
+    - button "Login" [ref=e11] [cursor=pointer]:
+      - link "Login" [ref=e12]:
+        - /url: /pages/applylogin_public
+  - navigation [ref=e14]:
+    - list [ref=e17]:
+      - listitem [ref=e18]:
+        - link "Home" [ref=e19] [cursor=pointer]:
+          - /url: /pages/public
+      - listitem [ref=e20]:
+        - link "About" [ref=e21] [cursor=pointer]:
+          - /url: "#about"
+      - listitem [ref=e22]:
+        - link "Features" [ref=e23] [cursor=pointer]:
+          - /url: "#features"
+      - listitem [ref=e24]:
+        - link "Contact" [ref=e25] [cursor=pointer]:
+          - /url: "#contact"
+  - generic [ref=e32]:
+    - heading "Welcome To" [level=4] [ref=e33]
+    - heading "Grants Management System" [level=1] [ref=e34]
+  - generic [ref=e40]:
+    - generic [ref=e42]:
+      - heading "About GMS" [level=1] [ref=e43]
+      - paragraph [ref=e44]: "\"Grants Management System (GMS) is a meticulously designed solution that optimizes the entire grant lifecycle, ensuring efficiency, transparency, and compliance. From application submission to post-award reporting, the GMS offers an intuitive interface, simplifying complex processes for applicants as well as agency users. It facilitates rigorous yet efficient evaluation and selection processes, with features for expense tracking, progress monitoring, and detailed reporting, ensuring financial and programmatic accountability."
+      - paragraph [ref=e45]: Our system supports post-award management, including grant monitoring, performance evaluation, and compliance oversight. Grant administrators can effortlessly track milestones, budget utilization, and outcomes. The in-built comprehensive reporting tools meet regulatory requirements, providing real-time insights to stakeholders. With robust security measures, the GMS safeguards sensitive data, maintaining confidentiality and integrity. It’s scalable, customizable, and user-friendly, tailored to specific agency needs.
+      - paragraph [ref=e46]: Experience heightened efficiency, transparency, and compliance in grant management with ISSI’s state-of-the-art GMS, thereby elevating your organization's grant administration and confidently achieving your mission."
+    - heading "Grant Management Lifecycle" [level=1] [ref=e51]
+  - generic [ref=e54]:
+    - generic [ref=e55]:
+      - heading "Features" [level=1] [ref=e56]
+      - heading "Features of Our Grants Management System" [level=1] [ref=e57]
+      - paragraph [ref=e58]: Maximise efficiency with all the features you need within a single system.
+    - generic [ref=e59]:
+      - generic [ref=e61]:
+        - generic [ref=e63]: 
+        - heading "Online Applications" [level=4] [ref=e64]
+        - paragraph [ref=e65]: Quickly fill in the applications online, save them, and submit them along with supporting documents. Track status of the submitted applications online.
+      - generic [ref=e67]:
+        - generic [ref=e69]: 
+        - heading "Flexible Workflows" [level=4] [ref=e70]
+        - paragraph [ref=e71]: Easily configure workflows for individual programs to ensure smooth, efficient, and automated process flow.
+      - generic [ref=e73]:
+        - generic [ref=e75]: 
+        - heading "Efficient Communication" [level=4] [ref=e76]
+        - paragraph [ref=e77]: Maintain effective and transparent communication using automatic email notifications and by communicating directly with applicants via the portal.
+      - generic [ref=e79]:
+        - generic [ref=e81]: 
+        - heading "Insightful Reports" [level=4] [ref=e82]
+        - paragraph [ref=e83]: Generate meaningful reports using powerful tools that help you gain insights and make informed decisions.
+  - generic [ref=e85]:
+    - generic [ref=e86]:
+      - heading "Contact Us" [level=1] [ref=e87]
+      - paragraph [ref=e88]: We’d love to hear from you! Please, Contact us at this Location.
+    - generic [ref=e89]:
+      - iframe [ref=e91]:
+        
+      - generic [ref=e93]:
+        - generic [ref=e94]:
+          - generic [ref=e95]: 
+          - heading "Maryland Headquarters" [level=4] [ref=e96]
+        - paragraph [ref=e97]: 7337 Hanover Pkwy, Suite# A, Greenbelt, MD 20770
+        - list [ref=e98]:
+          - listitem [ref=e99]:
+            - strong [ref=e100]: "Business Development:"
+            - text: 301-982-9700
+          - listitem [ref=e101]:
+            - strong [ref=e102]: "Products:"
+            - text: 301-982-9700
+          - listitem [ref=e103]:
+            - strong [ref=e104]: "Fax:"
+            - text: 301-982-0500
+          - listitem [ref=e105]:
+            - strong [ref=e106]: "Toll Free:"
+            - text: 1-888-810-3661
+          - listitem [ref=e107]:
+            - strong [ref=e108]: "Email:"
+            - link "info@issi-software.com" [ref=e109] [cursor=pointer]:
+              - /url: mailto:info@issi-software.com
+  - paragraph [ref=e115]:
+    - text: © Copyright 2026.
+    - link "International Software Systems, Inc" [ref=e116] [cursor=pointer]:
+      - /url: https://issi-software.com/
+    - text: "| All Rights Reserved | Version: 1.6 | Date: Jan 28, 2026"
+  - link "" [ref=e117] [cursor=pointer]:
+    - /url: "#"
+    - generic [ref=e118]: 
+```
