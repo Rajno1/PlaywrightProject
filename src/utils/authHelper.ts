@@ -1,37 +1,80 @@
 import { Page } from '@playwright/test';
-import { Loginpage } from '../page/Loginpage';
+import { LoginPage } from '../pages/login/LoginPage';
+import { UserRole } from '../types';
+import { Logger } from './logger';
 
-export async function loginAs(
-    page:Page,
-    role : 'staff' | 'Organization' | 'individual'
-){
+/**
+ * Authentication Helper
+ * Handles login for different user roles
+ */
+export async function loginAs(page: Page, role: UserRole): Promise<void> {
+  const loginPage = new LoginPage(page);
 
-  const loginpage = new Loginpage(page);
+  try {
+    Logger.info(`Attempting login as: ${role}`);
+    
+    await loginPage.gotoPublicPage();
+    await loginPage.clickOnLogin();
 
-  await loginpage.gotoPublicpage();
-  await loginpage.clickOnLogin();
+    switch (role) {
+      case 'staff':
+        await loginPage.clickOnStaffPortalLoginLink();
+        await loginPage.staffLogin(
+          process.env.STAFF_USERNAME!,
+          process.env.STAFF_PASSWORD!
+        );
+        Logger.success('Staff login successful');
+        break;
 
-  if( role === 'staff'){
-    await loginpage.clickOnStaffPortalLoginLink();
-    await loginpage.staffLogin(
-      process.env.STAFF_USERNAME!,//! = “I promise this exists”
-      process.env.STAFF_PASSWORD!
-    );
+      case 'Organization':
+        await loginPage.clickOnOrganizationPortalLoginLink();
+        await loginPage.organizationLogin(
+          process.env.ORG_USERNAME!, // ! =' i promise this exist'
+          process.env.ORG_PASSWORD!,
+          process.env.ORG_NAME!
+        );
+        Logger.success('Organization login successful');
+        break;
+
+      case 'individual':
+        await loginPage.clickOnIndividualLoginLink();
+        await loginPage.individualLogin(
+          process.env.IND_USERNAME!,
+          process.env.IND_PASSWORD!
+        );
+        Logger.success('Individual login successful');
+        break;
+
+      default:
+        throw new Error(`Unknown role: ${role}`);
+    }
+  } catch (error) {
+    Logger.error(`Login failed for role: ${role}`, error);
+    throw error;
   }
-  if(role === 'Organization'){
-    await loginpage.clickOnOrganizationPortalLoginLink();
-    await loginpage.organizationLogin(
-      process.env.ORG_USERNAME!,//! = “I promise this exists”
-      process.env.ORG_PASSWORD!,
-      process.env.ORG_NAME!
-    );
-  }
-  if(role === 'individual'){
-    await loginpage.clickOnIndividualLoginLink();
-    await loginpage.individualLogin(
-      process.env.IND_USERNAME!,//! = “I promise this exists”
-      process.env.IND_PASSWORD!
-    );
+}
+
+/**
+ * Validate environment variables
+ */
+export function validateEnvVariables(): void {
+  const requiredVars = [
+    'ISSI_GMS_URL',
+    'STAFF_USERNAME',
+    'STAFF_PASSWORD',
+    'ORG_USERNAME',
+    'ORG_PASSWORD',
+    'ORG_NAME',
+    'IND_USERNAME',
+    'IND_PASSWORD'
+  ];
+
+  const missingVars = requiredVars.filter(varName => !process.env[varName]);
+
+  if (missingVars.length > 0) {
+    Logger.error(`Missing environment variables: ${missingVars.join(', ')}`);
+    throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
   }
 
+  Logger.success('All environment variables validated');
 }
