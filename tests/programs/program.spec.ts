@@ -14,8 +14,8 @@ test.describe('Programs Module - Foundation Tests @smoke', () => {
 
   /* ==================== LIST PAGE TESTS ==================== */
 
-  test('TC-PL-001: Navigate to Programs List Page', async ({ staffPage }) => {
-    Logger.testStart('TC-PL-001: Navigate to Programs List Page');
+  test('TC-PL-001: Navigate to Programs Page', async ({ staffPage }) => {
+    Logger.testStart('TC-PL-001: Navigate to Programs Page');
 
     const programsPage = new ProgramsPage(staffPage);
 
