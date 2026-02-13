@@ -1,0 +1,11 @@
+================================================================================
+[INFO] 2026-02-11T08:22:03.422Z - Starting Test: Verify staff user can access Programs menu
+[INFO] 2026-02-11T08:22:05.335Z - Setting up staff user fixture
+[INFO] 2026-02-11T08:22:06.753Z - Using existing staff auth state
+================================================================================
+[INFO] 2026-02-11T08:22:16.710Z - Starting Test: Verify staff user can access Programs menu
+================================================================================
+[INFO] 2026-02-11T08:22:16.753Z - Opening menu: Programs
+[INFO] 2026-02-11T08:22:46.962Z - Ending Test: Verify staff user can access Programs menu
+================================================================================
+[INFO] 2026-02-11T08:22:47.136Z - Staff user fixture cleaned up

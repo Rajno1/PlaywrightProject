@@ -8,6 +8,45 @@ import { Logger } from "@utils/logger";
 export class BasePage {
   constructor(protected page: Page) {}
 
+  /* ==================== Menu Navigation Methods ==================== */
+
+  /**
+   * Generic menu locator
+   */
+  menu(menuName: string): Locator {
+    return this.page.locator(`ul.vg-nav-wrapper [aria-label="${menuName}"]`);
+  }
+
+  /**
+   * Generic sub menu locator
+   */
+  subMenu(subMenuName: string): Locator {
+    return this.page.locator(`.left.show [aria-label="${subMenuName}"]`);
+  }
+
+  /**
+   * Open a menu
+   */
+  async openMenu(menuName: string): Promise<void> {
+    Logger.info(`Opening menu: ${menuName}`);
+    const menuLocator = this.menu(menuName);
+    await this.waitForElement(menuLocator);
+    await menuLocator.click();
+  }
+
+  /**
+   * Open a sub menu
+   */
+  async openSubMenu(parent: string, child: string): Promise<void> {
+    Logger.info(`Opening submenu: ${parent} > ${child}`);
+    await this.openMenu(parent);
+    const subMenuLocator = this.subMenu(child);
+    await this.waitForElement(subMenuLocator);
+    await subMenuLocator.click();
+  }
+
+
+
   /* ==================== Navigation Methods ==================== */
 
   /**
@@ -121,42 +160,6 @@ export class BasePage {
     return await locator.isEnabled();
   }
 
-  /* ==================== Menu Navigation Methods ==================== */
-
-  /**
-   * Generic menu locator
-   */
-  menu(menuName: string): Locator {
-    return this.page.locator(`ul.vg-nav-wrapper [aria-label="${menuName}"]`);
-  }
-
-  /**
-   * Generic sub menu locator
-   */
-  subMenu(subMenuName: string): Locator {
-    return this.page.locator(`.left.show [aria-label="${subMenuName}"]`);
-  }
-
-  /**
-   * Open a menu
-   */
-  async openMenu(menuName: string): Promise<void> {
-    Logger.info(`Opening menu: ${menuName}`);
-    const menuLocator = this.menu(menuName);
-    await this.waitForElement(menuLocator);
-    await menuLocator.click();
-  }
-
-  /**
-   * Open a sub menu
-   */
-  async openSubMenu(parent: string, child: string): Promise<void> {
-    Logger.info(`Opening submenu: ${parent} > ${child}`);
-    await this.openMenu(parent);
-    const subMenuLocator = this.subMenu(child);
-    await this.waitForElement(subMenuLocator);
-    await subMenuLocator.click();
-  }
 
   /* ==================== Assertion Methods ==================== */
 

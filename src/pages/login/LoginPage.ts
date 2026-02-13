@@ -1,5 +1,5 @@
-import { Page, Locator } from '@playwright/test';
-import { BasePage } from '../base/BasePage';
+import { Page, Locator } from '@playwright/test'; // absolute minimum imports for page object
+import { BasePage } from '../base/BasePage'; // Relative import for BasePage,
 import { Logger } from '@utils/logger';
 
 /**

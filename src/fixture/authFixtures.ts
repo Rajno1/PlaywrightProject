@@ -1,23 +1,25 @@
 import { test as base, Page } from '@playwright/test';
 import fs from 'fs';
-import path from 'path';
 import { loginAs } from '@utils/authHelper';
 import { Paths } from '@constants/Paths';
 import { Logger } from '@utils/logger';
 
-/**
- * Custom Fixtures
- * Provides authenticated pages for different user roles
- */
+// Page Objects
+import { ProgramsPage } from '@pages/programs/ProgramsPage';
+import { AddProgramPage } from '@pages/programs/AddProgramPage';
+import { EditProgramPage } from '@pages/programs/EditProgramPage';
 
-/* ==================== Types ==================== */
+/* ==================== TYPES ==================== */
 type Fixtures = {
   staffPage: Page;
   orgPage: Page;
   individualPage: Page;
+  programsPage: ProgramsPage;
+  addProgramPage: AddProgramPage;
+  editProgramPage: EditProgramPage;
 };
 
-/* ==================== Helper Functions ==================== */
+/* ==================== HELPER FUNCTIONS ==================== */
 
 /**
  * Ensure auth directory exists
@@ -29,124 +31,101 @@ function ensureAuthDirectoryExists(): void {
   }
 }
 
-/* ==================== Fixtures ==================== */
+/**
+ * Create authenticated page for any role
+ * DRY approach - reusable helper
+ */
+async function createAuthenticatedPage(
+  browser: any,
+  authFile: string,
+  role: 'staff' | 'Organization' | 'individual'
+): Promise<Page> {
+  ensureAuthDirectoryExists(); // ✅ Added: ensure directory exists
+  
+  const context = await browser.newContext({
+    storageState: fs.existsSync(authFile) ? authFile : undefined,
+  });
+  
+  const page = await context.newPage();
+  
+  if (!fs.existsSync(authFile)) {
+    Logger.info(`No auth found for ${role}, logging in`); // ✅ Fixed: parentheses
+    await loginAs(page, role);
+    await context.storageState({ path: authFile });
+    Logger.success(`${role} auth saved`); // ✅ Fixed: parentheses
+  } else {
+    Logger.info(`Using existing auth for ${role}`); // ✅ Fixed: parentheses
+  }
+  
+  await page.goto('/profiles/dashboard');
+  await page.waitForLoadState('networkidle');
+  
+  return page;
+}
+
+/* ==================== FIXTURES ==================== */
 
 export const test = base.extend<Fixtures>({
-  /**
-   * Staff User Fixture
-   * Provides authenticated page for staff user
-   */
+  
+  /* -------- AUTHENTICATION FIXTURES -------- */
+  
   staffPage: async ({ browser }, use) => {
-    ensureAuthDirectoryExists();
-    const authFile = Paths.STAFF_AUTH_FILE;
-
-    Logger.info('Setting up staff user fixture');
-
-    // Create browser context with existing auth (if available)
-    const context = await browser.newContext({
-      storageState: fs.existsSync(authFile) ? authFile : undefined,
-    });
-
-    const page = await context.newPage();
-
-    // First time login only
-    if (!fs.existsSync(authFile)) {
-      Logger.info('No existing auth found, performing login');
-      await loginAs(page, 'staff');
-      // Save login session
-      await context.storageState({ path: authFile });
-      Logger.success('Staff auth state saved');
-    } else {
-      Logger.info('Using existing staff auth state');
-    }
-
-    // Navigate to dashboard
-    await page.goto('/profiles/dashboard');
-    await page.waitForLoadState('networkidle');
-
-    // Provide logged-in page to test
+    const page = await createAuthenticatedPage(
+      browser,
+      Paths.STAFF_AUTH_FILE,
+      'staff'
+    );
     await use(page);
-
-    // Cleanup
-    await context.close();
-    Logger.info('Staff user fixture cleaned up');
+    await page.context().close();
   },
 
-  /**
-   * Organization User Fixture
-   * Provides authenticated page for organization user
-   */
   orgPage: async ({ browser }, use) => {
-    ensureAuthDirectoryExists();
-    const authFile = Paths.ORG_AUTH_FILE;
-
-    Logger.info('Setting up organization user fixture');
-
-    const context = await browser.newContext({
-      storageState: fs.existsSync(authFile) ? authFile : undefined,
-    });
-
-    const page = await context.newPage();
-
-    // First time login only
-    if (!fs.existsSync(authFile)) {
-      Logger.info('No existing auth found, performing login');
-      await loginAs(page, 'Organization');
-      await context.storageState({ path: authFile });
-      Logger.success('Organization auth state saved');
-    } else {
-      Logger.info('Using existing organization auth state');
-    }
-
-    // Navigate to dashboard
-    await page.goto('/profiles/dashboard');
-    await page.waitForLoadState('networkidle');
-
-    // Provide logged-in page to test
+    const page = await createAuthenticatedPage(
+      browser,
+      Paths.ORG_AUTH_FILE,
+      'Organization'
+    );
     await use(page);
-
-    // Cleanup
-    await context.close();
-    Logger.info('Organization user fixture cleaned up');
+    await page.context().close();
   },
 
-  /**
-   * Individual User Fixture
-   * Provides authenticated page for individual user
-   */
   individualPage: async ({ browser }, use) => {
-    ensureAuthDirectoryExists();
-    const authFile = Paths.INDIVIDUAL_AUTH_FILE;
-
-    Logger.info('Setting up individual user fixture');
-
-    const context = await browser.newContext({
-      storageState: fs.existsSync(authFile) ? authFile : undefined,
-    });
-
-    const page = await context.newPage();
-
-    // First time login only
-    if (!fs.existsSync(authFile)) {
-      Logger.info('No existing auth found, performing login');
-      await loginAs(page, 'individual');
-      await context.storageState({ path: authFile });
-      Logger.success('Individual auth state saved');
-    } else {
-      Logger.info('Using existing individual auth state');
-    }
-
-    // Navigate to dashboard
-    await page.goto('/profiles/dashboard');
-    await page.waitForLoadState('networkidle');
-
-    // Provide logged-in page to test
+    const page = await createAuthenticatedPage(
+      browser,
+      Paths.INDIVIDUAL_AUTH_FILE,
+      'individual'
+    );
     await use(page);
+    await page.context().close();
+  },
 
-    // Cleanup
-    await context.close();
-    Logger.info('Individual user fixture cleaned up');
+  /* -------- PAGE OBJECT FIXTURES -------- */
+  
+  programsPage: async ({ staffPage }, use) => {
+    await use(new ProgramsPage(staffPage));
+  },
+
+  addProgramPage: async ({ staffPage }, use) => {
+    await use(new AddProgramPage(staffPage));
+  },
+
+  editProgramPage: async ({ staffPage }, use) => {
+    await use(new EditProgramPage(staffPage));
   },
 });
+
+/* ==================== GLOBAL HOOKS ==================== */
+
+test.beforeEach(async ({}, testInfo) => {
+  Logger.separator();
+  Logger.info(`Starting Test: ${testInfo.title}`); // ✅ Fixed: parentheses
+});
+
+test.afterEach(async ({}, testInfo) => {
+  Logger.info(`Ending Test: ${testInfo.title}`); // ✅ Fixed: parentheses
+  Logger.separator();
+});
+
+/* ==================== EXPORTS ==================== */
 
 export { expect } from '@playwright/test';
