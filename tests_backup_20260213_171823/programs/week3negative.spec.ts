@@ -1,8 +1,8 @@
-import { test, expect } from '@fixtures/authFixtures';
-import { ProgramsPage } from '@pages/programs/ProgramsPage';
-import { AddProgramPage } from '@pages/programs/AddProgramPage';
-import { ProgramFactory } from '@utils/factories/ProgramFactory';
-import { Logger } from '@utils/logger';
+import { test, expect } from '../../src/fixtures/authFixtures';
+import { ProgramsPage } from '../../src/pages/programs/ProgramsPage';
+import { AddProgramPage } from '../../src/pages/programs/AddProgramPage';
+import { TestDataFactory } from '../../src/utils/TestDataFactory';
+import { Logger } from '../../src/utils/logger';
 
 /**
  * WEEK 3: Negative Tests & Validations (20 tests)
@@ -15,7 +15,7 @@ test.describe('Week 3 - Negative Tests @week3 @negative', () => {
   let programData: any;
 
   test.beforeEach(async () => {
-    programData = ProgramFactory.generateBasicInfo();
+    programData = TestDataFactory.generateProgramData();
     Logger.separator();
   });
 

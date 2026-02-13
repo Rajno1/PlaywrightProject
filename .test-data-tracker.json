@@ -1,0 +1,28 @@
+{
+  "programs": [
+    {
+      "code": "PROG83447284",
+      "name": "Test Program 83447284",
+      "createdAt": "2026-02-13T11:50:47.284Z"
+    },
+    {
+      "code": "PROG83495178",
+      "name": "Test Program 83495178",
+      "createdAt": "2026-02-13T11:51:35.182Z"
+    },
+    {
+      "code": "PROG83539286",
+      "name": "Test Program 83539286",
+      "createdAt": "2026-02-13T11:52:19.287Z"
+    },
+    {
+      "code": "PROG83590799",
+      "name": "Test Program 83590799",
+      "createdAt": "2026-02-13T11:53:10.801Z"
+    }
+  ],
+  "grants": [],
+  "applications": [],
+  "users": [],
+  "fundingSources": []
+}

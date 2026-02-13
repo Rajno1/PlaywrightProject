@@ -1,0 +1,18 @@
+================================================================================
+[INFO] 2026-02-13T11:51:27.024Z - Starting Test: TC-AP-002: Create Program with All Fields
+[INFO] 2026-02-13T11:51:28.070Z - Setting up staff user fixture
+[INFO] 2026-02-13T11:51:29.361Z - Using existing staff auth state
+================================================================================
+[INFO] 2026-02-13T11:51:35.175Z - Starting Test: TC-AP-002: Create Program with All Fields
+================================================================================
+[INFO] 2026-02-13T11:51:35.184Z - Generated complete program data: PROG83495178
+[STEP] 2026-02-13T11:51:35.192Z - Executing: Navigating to Programs page
+[INFO] 2026-02-13T11:51:35.196Z - Opening menu: Programs
+[STEP] 2026-02-13T11:51:37.133Z - Executing: Clicking Add New Program button
+[INFO] 2026-02-13T11:51:37.133Z - Clicking on: Add New Program button
+[STEP] 2026-02-13T11:51:38.589Z - Executing: Filling program form with data
+[INFO] 2026-02-13T11:51:38.589Z - Selecting department: Test Department
+[INFO] 2026-02-13T11:51:38.589Z - Selecting option 'Test Department' from Department
+[INFO] 2026-02-13T11:52:08.762Z - Ending Test: TC-AP-002: Create Program with All Fields
+================================================================================
+[INFO] 2026-02-13T11:52:08.867Z - Staff user fixture cleaned up

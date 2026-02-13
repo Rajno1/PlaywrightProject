@@ -1,0 +1,13 @@
+================================================================================
+[INFO] 2026-02-13T11:50:19.969Z - Starting Test: TC-PL-003: Apply Active Filter
+[INFO] 2026-02-13T11:50:20.689Z - Setting up staff user fixture
+[INFO] 2026-02-13T11:50:21.734Z - Using existing staff auth state
+================================================================================
+[INFO] 2026-02-13T11:50:30.104Z - Starting Test: TC-PL-003: Apply Active Filter
+================================================================================
+[STEP] 2026-02-13T11:50:30.107Z - Executing: Navigating to Programs page
+[INFO] 2026-02-13T11:50:30.107Z - Opening menu: Programs
+[STEP] 2026-02-13T11:50:33.246Z - Executing: Selecting Active filter
+[INFO] 2026-02-13T11:50:33.446Z - Ending Test: TC-PL-003: Apply Active Filter
+================================================================================
+[INFO] 2026-02-13T11:50:33.602Z - Staff user fixture cleaned up

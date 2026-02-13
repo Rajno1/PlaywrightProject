@@ -1,0 +1,15 @@
+================================================================================
+[INFO] 2026-02-13T11:49:18.256Z - Starting Test: Read Excel data as JSON
+================================================================================
+[INFO] 2026-02-13T11:49:18.258Z - Starting Test: Read Excel data as JSON
+================================================================================
+[SUCCESS] 2026-02-13T11:49:18.290Z - ✓ Excel file read successfully: data.xlsx (3 records from sheet: Sheet1)
+[INFO] 2026-02-13T11:49:18.290Z - Total records in Excel: 3
+[INFO] 2026-02-13T11:49:18.290Z - Record: {"firstname":"john","lastname":"white","username":"jwhite","password":"JohnWhite"}
+[INFO] 2026-02-13T11:49:18.292Z - Record: {"firstname":"teda","lastname":"moon","username":"tmoom","password":"TedaMoon"}
+[INFO] 2026-02-13T11:49:18.293Z - Record: {"firstname":"James","lastname":"Brown","username":"Jbrown","password":"JamesBrown"}
+================================================================================
+[SUCCESS] 2026-02-13T11:49:18.294Z - ✓ Test Completed: Read Excel data as JSON
+================================================================================
+[INFO] 2026-02-13T11:49:18.295Z - Ending Test: Read Excel data as JSON
+================================================================================

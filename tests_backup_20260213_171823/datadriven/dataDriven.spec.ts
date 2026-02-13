@@ -1,8 +1,8 @@
-import { test, expect } from '@fixtures/authFixtures';
-import { DataReader } from '@utils/dataReader';
-import { ExcelOutputType } from '@enums/Enums';
-import { Logger } from '@utils/logger';
-import { TestData, CsvData } from '@types/index';
+import { test, expect } from '../src/fixtures/authFixtures';
+import { DataReader } from '../src/utils/dataReader';
+import { ExcelOutputType } from '../src/enums/Enums';
+import { Logger } from '../src/utils/logger';
+import { TestData, CsvData } from '../src/types';
 
 /**
  * Data-Driven Testing Examples

@@ -40,7 +40,9 @@ async function createAuthenticatedPage(
   authFile: string,
   role: 'staff' | 'Organization' | 'individual'
 ): Promise<Page> {
-  ensureAuthDirectoryExists(); // ✅ Added: ensure directory exists
+  ensureAuthDirectoryExists();
+  
+  Logger.info(`Setting up ${role} user fixture`);
   
   const context = await browser.newContext({
     storageState: fs.existsSync(authFile) ? authFile : undefined,
@@ -49,12 +51,12 @@ async function createAuthenticatedPage(
   const page = await context.newPage();
   
   if (!fs.existsSync(authFile)) {
-    Logger.info(`No auth found for ${role}, logging in`); // ✅ Fixed: parentheses
+    Logger.info(`No existing auth found, performing login`);
     await loginAs(page, role);
     await context.storageState({ path: authFile });
-    Logger.success(`${role} auth saved`); // ✅ Fixed: parentheses
+    Logger.success(`${role} auth state saved`);
   } else {
-    Logger.info(`Using existing auth for ${role}`); // ✅ Fixed: parentheses
+    Logger.info(`Using existing ${role} auth state`);
   }
   
   await page.goto('/profiles/dashboard');
@@ -77,6 +79,7 @@ export const test = base.extend<Fixtures>({
     );
     await use(page);
     await page.context().close();
+    Logger.info('Staff user fixture cleaned up');
   },
 
   orgPage: async ({ browser }, use) => {
@@ -87,6 +90,7 @@ export const test = base.extend<Fixtures>({
     );
     await use(page);
     await page.context().close();
+    Logger.info('Organization user fixture cleaned up');
   },
 
   individualPage: async ({ browser }, use) => {
@@ -97,6 +101,7 @@ export const test = base.extend<Fixtures>({
     );
     await use(page);
     await page.context().close();
+    Logger.info('Individual user fixture cleaned up');
   },
 
   /* -------- PAGE OBJECT FIXTURES -------- */
@@ -118,11 +123,11 @@ export const test = base.extend<Fixtures>({
 
 test.beforeEach(async ({}, testInfo) => {
   Logger.separator();
-  Logger.info(`Starting Test: ${testInfo.title}`); // ✅ Fixed: parentheses
+  Logger.info(`Starting Test: ${testInfo.title}`);
 });
 
 test.afterEach(async ({}, testInfo) => {
-  Logger.info(`Ending Test: ${testInfo.title}`); // ✅ Fixed: parentheses
+  Logger.info(`Ending Test: ${testInfo.title}`);
   Logger.separator();
 });
 

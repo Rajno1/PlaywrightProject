@@ -1,10 +1,10 @@
-import { test, expect } from '@fixtures/authFixtures';
-import { ProgramsPage } from '@pages/programs/ProgramsPage';
-import { AddProgramPage } from '@pages/programs/AddProgramPage';
-import { EditProgramPage } from '@pages/programs/EditProgramPage';
-import { ProgramFactory } from '@utils/factories/ProgramFactory';
-import { Logger } from '@utils/logger';
-import { Assertions } from '@utils/assertions';
+import { test, expect } from '../../src/fixtures/authFixtures';
+import { ProgramsPage } from '../../src/pages/programs/ProgramsPage';
+import { AddProgramPage } from '../../src/pages/programs/AddProgramPage';
+import { EditProgramPage } from '../../src/pages/programs/EditProgramPage';
+import { TestDataFactory } from '../../src/utils/TestDataFactory';
+import { Logger } from '../../src/utils/logger';
+import { Assertions } from '../../src/utils/assertions';
 
 /**
  * WEEK 2: Positive Functional Tests (15 tests)
@@ -17,7 +17,7 @@ test.describe('Week 2 - Positive Functional Tests @week2', () => {
   let programData: any;
 
   test.beforeEach(async () => {
-    programData = ProgramFactory.generateBasicInfo();
+    programData = TestDataFactory.generateProgramData();
     Logger.separator();
   });
 

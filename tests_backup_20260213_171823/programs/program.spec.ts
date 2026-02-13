@@ -10,7 +10,7 @@ import { Logger } from '@utils/logger';
  * Programs Module - Foundation Tests
  * Tests the basic functionality of the Programs module
  */
-test.describe('Programs Module - Foundation Tests @smoke', () => {
+test.describe('Programs Module - Foundation Tests @smoke', () => {̀
 
   /* ==================== LIST PAGE TESTS ==================== */
 

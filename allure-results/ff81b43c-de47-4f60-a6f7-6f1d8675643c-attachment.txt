@@ -1,0 +1,15 @@
+================================================================================
+[INFO] 2026-02-13T11:49:17.964Z - Starting Test: Read and validate JSON test data
+================================================================================
+[INFO] 2026-02-13T11:49:17.966Z - Starting Test: Read and validate JSON test data
+================================================================================
+[SUCCESS] 2026-02-13T11:49:17.969Z - ✓ JSON file read successfully: data.json
+[INFO] 2026-02-13T11:49:17.970Z - Total records in JSON: 3
+[INFO] 2026-02-13T11:49:17.970Z - Username: rmaddigalla, Email: rajasekahr@email.com
+[INFO] 2026-02-13T11:49:17.978Z - Username: rsekhar, Email: rsekhar@email.com
+[INFO] 2026-02-13T11:49:17.982Z - Username: vinuthna, Email: vinuthna@email.com
+================================================================================
+[SUCCESS] 2026-02-13T11:49:17.991Z - ✓ Test Completed: Read and validate JSON test data
+================================================================================
+[INFO] 2026-02-13T11:49:18.002Z - Ending Test: Read and validate JSON test data
+================================================================================

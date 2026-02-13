@@ -1,10 +1,10 @@
-import { test, expect } from '@fixtures/authFixtures';
-import { ProgramsPage } from '@pages/programs/ProgramsPage';
-import { AddProgramPage } from '@pages/programs/AddProgramPage';
-import { EditProgramPage } from '@pages/programs/EditProgramPage';
-import { ProgramFactory } from '@utils/factories/ProgramFactory';
-import { Logger } from '@utils/logger';
-import { Assertions } from '@utils/assertions';
+import { test, expect } from '../../src/fixtures/authFixtures';
+import { ProgramsPage } from '../../src/pages/programs/ProgramsPage';
+import { AddProgramPage } from '../../src/pages/programs/AddProgramPage';
+import { EditProgramPage } from '../../src/pages/programs/EditProgramPage';
+import { TestDataFactory } from '../../src/utils/testDataFactory';
+import { Logger } from '../../src/utils/logger';
+import { Assertions } from '../../src/utils/assertions';
 
 /**
  * WEEK 1: Foundation Tests (10 tests)
@@ -75,7 +75,7 @@ test.describe('Week 1 - Foundation Tests @week1', () => {
     const editProgramPage = new EditProgramPage(staffPage);
 
     // Generate unique test data
-    const programData = ProgramFactory.generateBasicInfo();
+    const programData = TestDataFactory.generateProgramData();
 
     await test.step('Navigate to Add Program page', async () => {
       await programsPage.navigateToProgramsPage();
@@ -105,7 +105,7 @@ test.describe('Week 1 - Foundation Tests @week1', () => {
     const addProgramPage = new AddProgramPage(staffPage);
     const editProgramPage = new EditProgramPage(staffPage);
 
-    const programData = ProgramFactory.generateBasicInfo();
+    const programData = TestDataFactory.generateProgramData();
 
     await test.step('Navigate to Add Program page', async () => {
       await programsPage.navigateToProgramsPage();
@@ -140,7 +140,7 @@ test.describe('Week 1 - Foundation Tests @week1', () => {
     const addProgramPage = new AddProgramPage(staffPage);
     const editProgramPage = new EditProgramPage(staffPage);
 
-    const programData = ProgramFactory.generateBasicInfo();
+    const programData = TestDataFactory.generateProgramData();
 
     await test.step('Create a new program', async () => {
       await programsPage.navigateToProgramsPage();
@@ -239,7 +239,7 @@ test.describe('Week 1 - Foundation Tests @week1', () => {
     const addProgramPage = new AddProgramPage(staffPage);
     const editProgramPage = new EditProgramPage(staffPage);
 
-    const programData = ProgramFactory.generateBasicInfo();
+    const programData = TestDataFactory.generateProgramData();
 
     await test.step('Create a program first', async () => {
       await programsPage.navigateToProgramsPage();
@@ -269,7 +269,7 @@ test.describe('Week 1 - Foundation Tests @week1', () => {
     const addProgramPage = new AddProgramPage(staffPage);
     const editProgramPage = new EditProgramPage(staffPage);
 
-    const programData = ProgramFactory.generateBasicInfo();
+    const programData = TestDataFactory.generateProgramData();
 
     await test.step('Create a program', async () => {
       await programsPage.navigateToProgramsPage();

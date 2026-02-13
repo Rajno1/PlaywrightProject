@@ -21,6 +21,6 @@
       "@types/*": ["src/types/*"]
     }
   },
-  "include": ["src/**/*", "tests/**/*"],
+  "include": ["src/**/*", "tests/**/*", "tests/programs/program.spec.ts"],
   "exclude": ["node_modules", "dist", "test-results", "playwright-report", "allure-results", "allure-report"]
 }
