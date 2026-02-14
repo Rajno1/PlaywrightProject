@@ -45,12 +45,12 @@ export class ProgramsPage extends BasePage {
 
     // Initialize locators
     this.addNewProgramButton = page.locator('a:has-text("Add New Program")');
-    this.programsHeader = page.locator('h1:has-text("Programs"), h2:has-text("Programs")').first();
+    this.programsHeader = page.locator('div:has-text("Programs")').first();
 
     // Filter radio buttons
-    this.activeRadioButton = page.locator('input[value="Active"]');
-    this.inactiveRadioButton = page.locator('input[value="Inactive"]');
-    this.allRadioButton = page.locator('input[value="All"]');
+    this.activeRadioButton = page.locator('input[value="Active"]:visible');
+    this.inactiveRadioButton = page.locator('input[value="Inactive"]:visible');
+    this.allRadioButton = page.locator('input[value="All"]:visible');
 
     // Table headers
     this.selectAllCheckbox = page.locator('th:has-text("Select All") input[type="checkbox"]');
