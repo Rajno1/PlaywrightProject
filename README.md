@@ -288,7 +288,24 @@ npm run test:parallel
 
 # Run tests one at a time
 npm run test:serial
+
+# Run full spec	
+npm run test -- tests/programs/program.spec.ts
+
+# Run single test	
+npm run test -- tests/programs/program.spec.ts -g "TC-PP-001"
+
+# Headed + single test
+npm run test:headed -- tests/programs/program.spec.ts -g "TC-PP-001"
+
+# Run by tag	
+npm run test -- -g "@programs"
+
 ```
+
+
+
+
 
 ### View Reports
 

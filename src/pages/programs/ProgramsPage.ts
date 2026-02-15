@@ -1,21 +1,21 @@
 import { Page, Locator } from '@playwright/test';
-import { BasePage } from '../base/BasePage';
+import { SharedComponents } from '../base/SharedComponents';
 import { Logger } from '../../utils/logger';
 
 /**
  * Programs List Page Object
  * Handles all interactions on the Programs listing page
  */
-export class ProgramsPage extends BasePage {
+export class ProgramsPage extends SharedComponents {
   
   // Header elements
   readonly addNewProgramButton: Locator;
   readonly programsHeader: Locator;
 
-  // Filter radio buttons
-  readonly activeRadioButton: Locator;
-  readonly inactiveRadioButton: Locator;
-  readonly allRadioButton: Locator;
+  // // Filter radio buttons
+  // readonly activeRadioButton: Locator;
+  // readonly inactiveRadioButton: Locator;
+  // readonly allRadioButton: Locator;
 
   // Table elements
   readonly selectAllCheckbox: Locator;
@@ -47,10 +47,10 @@ export class ProgramsPage extends BasePage {
     this.addNewProgramButton = page.locator('a:has-text("Add New Program")');
     this.programsHeader = page.locator('div:has-text("Programs")').first();
 
-    // Filter radio buttons
-    this.activeRadioButton = page.locator('input[value="Active"]:visible');
-    this.inactiveRadioButton = page.locator('input[value="Inactive"]:visible');
-    this.allRadioButton = page.locator('input[value="All"]:visible');
+    // // Filter radio buttons
+    // this.activeRadioButton = page.locator('input[value="Active"]:visible');
+    // this.inactiveRadioButton = page.locator('input[value="Inactive"]:visible');
+    // this.allRadioButton = page.locator('input[value="All"]:visible');
 
     // Table headers
     this.selectAllCheckbox = page.locator('th:has-text("Select All") input[type="checkbox"]');
@@ -81,10 +81,13 @@ export class ProgramsPage extends BasePage {
   /**
    * Navigate to Programs list page
    */
-  async navigateToProgramsPage(): Promise<void> {
-    Logger.step('Navigating to Programs page');
+  // async navigateToProgramsPage(): Promise<void> {
+  //   Logger.step('Navigating to Programs page');
+  //   await this.openMenu('Programs');
+  //   await this.waitForPageLoad();
+  // }
+   async navigateToProgramsPage(): Promise<void> {
     await this.openMenu('Programs');
-    await this.waitForPageLoad();
   }
 
   /**
@@ -97,31 +100,26 @@ export class ProgramsPage extends BasePage {
 
   /* ==================== Filter Methods ==================== */
 
+  
   /**
    * Select Active filter
    */
   async selectActiveFilter(): Promise<void> {
-    Logger.step('Selecting Active filter');
-    await this.activeRadioButton.check();
-    await this.waitForPageLoad();
+    await this.selectActiveFilter(); // Call the method from SharedComponents
   }
 
   /**
    * Select Inactive filter
    */
   async selectInactiveFilter(): Promise<void> {
-    Logger.step('Selecting Inactive filter');
-    await this.inactiveRadioButton.check();
-    await this.waitForPageLoad();
+    await this.selectInactiveFilter(); // Call the method from SharedComponents
   }
 
   /**
    * Select All filter
    */
   async selectAllFilter(): Promise<void> {
-    Logger.step('Selecting All filter');
-    await this.allRadioButton.check();
-    await this.waitForPageLoad();
+    await this.selectAllFilter(); // Call the method from SharedComponents
   }
 
   /* ==================== Search Methods ==================== */
