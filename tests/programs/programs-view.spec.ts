@@ -1,6 +1,7 @@
 import { test, expect } from '@fixtures/AuthFixtures';
 import { Assertions } from '@utils/assertions';
 import { Logger } from '@utils/logger';
+import { PageHeaders, AddNewLinkText } from '@enums/Enums';
 
 /**
  * Programs List Page Tests
@@ -18,22 +19,30 @@ test.describe('Programs View Page @programs @list', () => {
       await programsPage.navigateToProgramsPage();
     });
 
-    await test.step('Page title should display as "Programs"', async () => {
-      await Assertions.verifyElementVisible(
-        programsPage.programsHeader,
+    await test.step('Page heading should display as "Programs"', async () => {
+
+      await programsPage.verifyProgramHeaderVisibility();
+      
+      await Assertions.verifyElementText(programsPage.programPageHeader,
+        PageHeaders.PROGRAMS,
         'Programs page header'
       );
       
-      const headerText = await programsPage.programsHeader.textContent();
-      expect(headerText).toContain('Programs');
-      Logger.success('Page title displays correctly');
+      Logger.success('Page header displays correctly');
+    
     });
 
-    await test.step('"Add New Program" button is visible', async () => {
-      await Assertions.verifyElementVisible(
-        programsPage.addNewProgramButton,
-        'Add New Program button'
-      );
+    await test.step('"Add New Program" link is visible', async () => {
+
+      await programsPage.verifyAddNewProgramLinkVisibility();
+
+      await Assertions.verifyElementText(programsPage.addNewProgramLink,
+        AddNewLinkText.PROGRAM,
+        'Add new program link'
+      )
+
+      Logger.success('Add new program link displays correctly');
+  
     });
 
     await test.step('Filter options (Active, Inactive, All) are visible', async () => {

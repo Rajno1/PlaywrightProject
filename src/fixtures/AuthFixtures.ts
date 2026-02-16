@@ -5,6 +5,7 @@ import { Paths } from '@constants/Paths';
 import { Logger } from '@utils/logger';
 
 // Page Objects
+import { LoginPage } from '@pages/login/LoginPage';
 import { ProgramsPage } from '@pages/programs/ProgramsPage';
 import { AddProgramPage } from '@pages/programs/AddProgramPage';
 import { EditProgramPage } from '@pages/programs/EditProgramPage';
@@ -52,8 +53,10 @@ async function createAuthenticatedPage(
   
   if (!fs.existsSync(authFile)) {
     Logger.info(`No existing auth found, performing login`);
+  
     await loginAs(page, role);
     await context.storageState({ path: authFile });
+
     Logger.success(`${role} auth state saved`);
   } else {
     Logger.info(`Using existing ${role} auth state`);

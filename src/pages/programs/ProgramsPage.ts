@@ -1,6 +1,8 @@
 import { Page, Locator } from '@playwright/test';
 import { SharedComponents } from '../base/SharedComponents';
 import { Logger } from '../../utils/logger';
+import { AddNewLinkText, PageHeaders } from '@enums/Enums';
+
 
 /**
  * Programs List Page Object
@@ -8,15 +10,8 @@ import { Logger } from '../../utils/logger';
  */
 export class ProgramsPage extends SharedComponents {
   
-  // Header elements
-  readonly addNewProgramButton: Locator;
-  readonly programsHeader: Locator;
-
-  // // Filter radio buttons
-  // readonly activeRadioButton: Locator;
-  // readonly inactiveRadioButton: Locator;
-  // readonly allRadioButton: Locator;
-
+ 
+  
   // Table elements
   readonly selectAllCheckbox: Locator;
   readonly programCodeHeader: Locator;
@@ -42,15 +37,6 @@ export class ProgramsPage extends SharedComponents {
 
   constructor(page: Page) {
     super(page);
-
-    // Initialize locators
-    this.addNewProgramButton = page.locator('a:has-text("Add New Program")');
-    this.programsHeader = page.locator('div:has-text("Programs")').first();
-
-    // // Filter radio buttons
-    // this.activeRadioButton = page.locator('input[value="Active"]:visible');
-    // this.inactiveRadioButton = page.locator('input[value="Inactive"]:visible');
-    // this.allRadioButton = page.locator('input[value="All"]:visible');
 
     // Table headers
     this.selectAllCheckbox = page.locator('th:has-text("Select All") input[type="checkbox"]');
@@ -81,11 +67,7 @@ export class ProgramsPage extends SharedComponents {
   /**
    * Navigate to Programs list page
    */
-  // async navigateToProgramsPage(): Promise<void> {
-  //   Logger.step('Navigating to Programs page');
-  //   await this.openMenu('Programs');
-  //   await this.waitForPageLoad();
-  // }
+
    async navigateToProgramsPage(): Promise<void> {
     await this.openMenu('Programs');
   }
@@ -93,9 +75,37 @@ export class ProgramsPage extends SharedComponents {
   /**
    * Click Add New Program button
    */
+
   async clickAddNewProgram(): Promise<void> {
     Logger.step('Clicking Add New Program button');
-    await this.clickElement(this.addNewProgramButton, 'Add New Program button');
+    await this.clickElement(this.addNewProgramLink, 'Add New Program button');
+  }
+
+  
+ /* ==================== Get Program Page Header methods  ==================== */
+
+  get programPageHeader(): Locator {
+    return this.getPageHeader(PageHeaders.PROGRAMS);
+  }    
+
+  get addNewProgramLink(): Locator {
+    return this.getAddNewlink(AddNewLinkText.PROGRAM);
+  }
+
+  /* ==================== Page Page Header Verification Methods ==================== */
+
+  /**
+   * verify Program page headder is visible
+   */
+  async verifyProgramHeaderVisibility(): Promise<void> {
+    await this.verifyElementVisible(this.programPageHeader, 'Programs page header');
+  }
+
+  /**
+   * Verify Add New Program button is visible
+   */
+  async verifyAddNewProgramLinkVisibility(): Promise<void> {
+    await this.verifyElementVisible(this.addNewProgramLink, 'Add New Program link');
   }
 
   /* ==================== Filter Methods ==================== */
@@ -105,21 +115,21 @@ export class ProgramsPage extends SharedComponents {
    * Select Active filter
    */
   async selectActiveFilter(): Promise<void> {
-    await this.selectActiveFilter(); // Call the method from SharedComponents
+    await this.selectActiveRadioButton(); // Call the method from SharedComponents
   }
 
   /**
    * Select Inactive filter
    */
   async selectInactiveFilter(): Promise<void> {
-    await this.selectInactiveFilter(); // Call the method from SharedComponents
+    await this.selectInactiveRadioButton(); // Call the method from SharedComponents
   }
 
   /**
    * Select All filter
    */
   async selectAllFilter(): Promise<void> {
-    await this.selectAllFilter(); // Call the method from SharedComponents
+    await this.selectAllRadioButton(); // Call the method from SharedComponents
   }
 
   /* ==================== Search Methods ==================== */
@@ -314,10 +324,5 @@ export class ProgramsPage extends SharedComponents {
     return match ? parseInt(match[1]) : 0;
   }
 
-  /**
-   * Verify Add New Program button is visible
-   */
-  async verifyAddNewProgramButtonVisible(): Promise<void> {
-    await this.verifyElementVisible(this.addNewProgramButton, 'Add New Program button');
-  }
+  
 }

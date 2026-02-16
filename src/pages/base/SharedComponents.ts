@@ -57,8 +57,18 @@ export class SharedComponents extends BasePage {
     await this.waitForPageLoad();
   }
 
-  
-  /* ==================== STATUS FILTER RADIO BUTTONS ==================== */
+/* ==================== Headder and Add New Records ==================== */
+
+  getPageHeader(headerText: string): Locator {
+    return this.page.locator(`.card-header:has-text("${headerText}") > div`).first();
+  }
+
+  getAddNewlink(linkText: string): Locator {
+    return this.page.locator(`a.link-btn:has-text("${linkText}")`).first();
+  }
+
+
+ /* ==================== STATUS FILTER RADIO BUTTONS ==================== */
   
   /**
    * Get Active/Inactive/All filter radio buttons
@@ -87,7 +97,7 @@ export class SharedComponents extends BasePage {
   /**
    * Select Active filter (reusable across pages)
    */
-  async selectActiveFilter(): Promise<void> {
+  async selectActiveRadioButton(): Promise<void> {
     Logger.info('Selecting Active filter');
     await this.getActiveRadioButton().check();
     await this.waitForPageLoad();
@@ -97,7 +107,7 @@ export class SharedComponents extends BasePage {
   /**
    * Select Inactive filter (reusable across pages)
    */
-  async selectInactiveFilter(): Promise<void> {
+  async selectInactiveRadioButton(): Promise<void> {
     Logger.info('Selecting Inactive filter');
     await this.getInactiveRadioButton().check();
     await this.waitForPageLoad();
@@ -107,7 +117,7 @@ export class SharedComponents extends BasePage {
   /**
    * Select All filter (reusable across pages)
    */
-  async selectAllFilter(): Promise<void> {
+  async selectAllRadioButton(): Promise<void> {
     Logger.info('Selecting All filter');
     await this.getAllRadioButton().check();
     await this.waitForPageLoad();

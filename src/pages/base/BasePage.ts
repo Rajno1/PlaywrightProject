@@ -130,7 +130,7 @@ export class BasePage {
    * Verify element is visible
    */
   async verifyElementVisible(locator: Locator, elementName: string = 'element'): Promise<void> {
-    Logger.info(`Verifying ${elementName} is visible`);
+    Logger.info(`Verifying ${elementName} visibility`);
     await expect(locator).toBeVisible();
   }
 

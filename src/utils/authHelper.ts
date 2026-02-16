@@ -47,6 +47,9 @@ export async function loginAs(page: Page, role: UserRole): Promise<void> {
 
       default:
         throw new Error(`Unknown role: ${role}`);
+
+        // await page.waitForLoadState('networkidle');
+        // Logger.success(`${role} login successful`);
     }
   } catch (error) {
     Logger.error(`Login failed for role: ${role}`, error);

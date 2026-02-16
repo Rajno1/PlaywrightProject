@@ -14,7 +14,7 @@ export class Assertions {
     elementName: string,
     timeout: number = 10000
   ): Promise<void> {
-    Logger.info(`Verifying ${elementName} is visible`);
+    Logger.info(`Verifying ${elementName} visibility`);
     await expect(locator).toBeVisible({ timeout });
     Logger.success(`${elementName} is visible`);
   }

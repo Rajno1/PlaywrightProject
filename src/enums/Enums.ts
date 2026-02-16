@@ -24,6 +24,26 @@ export enum SubMenu {
   MASTER_FUNDING_SOURCES = 'Master Funding Sources'
 }
 
+
+export enum PageHeaders {
+  DASHBOARD = 'Dashboard',
+  PROGRAMS = 'Programs',
+  GRANTS = 'Grants',
+  APPLICATIONS = 'Applications',
+  AWARDS = 'Awards',
+  SUB_AWARDS = 'Sub Awards',
+  MASTER_FUNDING_SOURCES = 'Master Funding Sources'
+}
+
+export enum AddNewLinkText {
+  PROGRAM = 'Add New Program',
+  GRANT = 'Add New Grant',
+  APPLICATION = 'Add New Application',
+  AWARD = 'Add New Award',
+  SUB_AWARD = 'Add New Sub Award',
+  MASTER_FUNDING_SOURCE = 'Add New Master Funding Source'
+}
+
 export enum UserType {
   STAFF = 'staff',
   ORGANIZATION = 'Organization',
