@@ -46,9 +46,9 @@ export class LoginPage extends BasePage {
   /**
    * Check if login button is visible
    */
-  async isLoginVisible(): Promise<boolean> {
-    return await this.isElementVisible(this.loginButton);
-  }
+  // async isLoginVisible(): Promise<boolean> {
+  //   return await this.isElementVisible(this.loginButton);
+  // }
 
   /* ==================== Action Methods ==================== */
 

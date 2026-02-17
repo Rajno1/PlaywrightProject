@@ -14,7 +14,7 @@ export class Assertions {
     /**
    * Check if element is visible
    */
-  async isElementVisible(locator: Locator, timeout: number = 5000): Promise<boolean> {
+  static async isElementVisible(locator: Locator, timeout: number = 5000): Promise<boolean> {
     try {
       await locator.waitFor({ state: 'visible', timeout });
       return true;

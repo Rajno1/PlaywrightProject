@@ -4,26 +4,42 @@
   "description": "Playwright Test Automation Framework for ISSI GMS Application",
   "main": "index.js",
   "scripts": {
+
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    
     "test:chrome": "playwright test --project=chromium",
     "test:firefox": "playwright test --project=firefox",
     "test:webkit": "playwright test --project=webkit",
-    "test:ui": "playwright test --ui",
-    "test:tag": "playwright test --grep",
+    
     "test:parallel": "playwright test --workers=4",
     "test:serial": "playwright test --workers=1",
+    
+    "test:smoke": "playwright test --grep @smoke",
+    "test:regression": "playwright test --grep @regression",
+    "test:negative": "playwright test --grep @negative",
+    "test:e2e": "playwright test --grep @e2e",
+    "test:programs": "playwright test --grep @programs",
+    "test:tag": "playwright test --grep",
+
     "report": "playwright show-report",
     "report:html": "playwright show-report playwright-report",
+    
     "allure:generate": "allure generate ./allure-results --clean -o ./allure-report",
     "allure:open": "allure open ./allure-report",
     "allure:serve": "allure serve ./allure-results",
-    "clean": "rm -rf test-results playwright-report allure-results allure-report .auth/*.json",
+    
+    "clean": "rm -rf test-results playwright-report allure-results allure-report",
+    "clean:auth": "rm -rf .auth/*.json",
     "clean:all": "rm -rf test-results playwright-report allure-results allure-report .auth node_modules package-lock.json",
-    "pretest": "npm run clean:auth",
-    "clean:auth": "rm -rf .auth/*.json staffLogin.json orgLogin.json individualLogin.json",
-    "setup": "npm install && npx playwright install --with-deps"
+    
+    "setup": "npm install && npx playwright install --with-deps",
+    "setup:ci": "npm ci && npx playwright install chromium --with-deps",
+    
+    "ci": "npm run clean && playwright test",
+    "ci:smoke": "npm run clean && playwright test --grep @smoke"
   },
   "keywords": [
     "playwright",

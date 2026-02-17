@@ -2,20 +2,20 @@
   "cookies": [
     {
       "name": "csrftoken",
-      "value": "4wlmyfAq8JfTp8YzxsK18OD37UeTgGG4vdT6KmzjvwrBDATeP7825atgWv7rpDCB",
+      "value": "OtGTT4zIVz30DN3c6bJf0Fn9ZT0GxzDeLONZzHLcLoVVTW1zus46cBTCfkF70UIr",
       "domain": "issigmsdev.issi-software.com",
       "path": "/",
-      "expires": 1802766449.034175,
+      "expires": 1802773188.467084,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
     },
     {
       "name": "sessionid",
-      "value": "w6ma2w40geuncbf3uqt2r1fhdrh1dti9",
+      "value": "l3ea38kaeejg9yfpfb3kn5z45b2grcao",
       "domain": "issigmsdev.issi-software.com",
       "path": "/",
-      "expires": 1771921649.748075,
+      "expires": 1771928389.310258,
       "httpOnly": true,
       "secure": false,
       "sameSite": "Lax"

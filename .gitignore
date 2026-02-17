@@ -1,11 +1,85 @@
+# ============================================================
+# .gitignore - FILES GIT SHOULD IGNORE
+# ============================================================
+#
+# WHAT IS .gitignore?
+# When you run "git add .", git adds ALL files.
+# .gitignore tells git: "Don't track these files/folders."
+#
+# WHY IGNORE THINGS?
+# 1. Security: Never commit passwords (.env)
+# 2. Size: Don't commit huge folders (node_modules = thousands of files)
+# 3. Cleanliness: Don't commit generated files (they get re-created)
+# 4. Privacy: Don't commit login sessions (.auth/)
+# ============================================================
 
-# Playwright
+# ─── NODE.JS ─────────────────────────────────────────────────
+# Dependencies folder (huge! thousands of files, re-created by npm install)
 node_modules/
+
+# TypeScript compiled output (re-created by build)
+dist/
+
+# ─── PLAYWRIGHT SPECIFIC ─────────────────────────────────────
+# Test result files (generated every test run)
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
-/playwright/.auth/
-# Environment files
+
+# Authentication state files
+# These contain your login session cookies - treat like passwords!
+.auth/
+# Note: Your original gitignore had "/playwright/.auth/" which is wrong path
+
+# Screenshot and video files (generated on failure)
+screenshots/
+videos/
+
+# ─── ALLURE REPORTING ────────────────────────────────────────
+/allure-results/
+/allure-report/
+
+# ─── ENVIRONMENT FILES ───────────────────────────────────────
+# Your actual passwords - NEVER commit these!
 .env
 .env.*
+# Exception: .env.example is safe to commit (no real passwords)
+!.env.example
+
+# ─── TEST DATA TRACKING ──────────────────────────────────────
+# This file changes every test run and is not needed in git
+.test-data-tracker.json
+
+# ─── OPERATING SYSTEM FILES ──────────────────────────────────
+# Mac OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ─── EDITOR FILES ────────────────────────────────────────────
+# VS Code settings (optional: some teams commit .vscode/)
+# .vscode/
+# Uncomment above if you want to ignore VS Code settings
+
+# IntelliJ/WebStorm
+.idea/
+*.iml
+
+# ─── LOGS ────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── BACKUP FOLDERS ──────────────────────────────────────────
+# You have a tests_backup folder - decide if this should be in git
+# Uncomment to ignore it:
+# tests_backup_*/

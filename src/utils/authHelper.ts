@@ -2,6 +2,7 @@ import { Page } from '@playwright/test';
 import { LoginPage } from '../pages/login/LoginPage';
 import { UserRole } from '../types';
 import { Logger } from './logger';
+import { Assertions } from './assertions';
 
 /**
  * Authentication Helper
@@ -14,6 +15,7 @@ export async function loginAs(page: Page, role: UserRole): Promise<void> {
     Logger.info(`Attempting login as: ${role}`);
     
     await loginPage.gotoPublicPage();
+    await Assertions.verifyElementVisible(loginPage.loginButton,'Login button')
     await loginPage.clickOnLogin();
 
     switch (role) {

@@ -1,27 +1,262 @@
-name: Playwright Tests
+# ============================================================
+# GITHUB ACTIONS WORKFLOW FILE
+# ============================================================
+# 
+# WHAT IS THIS FILE?
+# This is a recipe/instruction file for a robot (GitHub Actions).
+# When you push code to GitHub, this robot wakes up,
+# follows these instructions, and runs your Playwright tests.
+#
+# WHERE DOES IT LIVE?
+# It MUST be in exactly this path: .github/workflows/playwright.yml
+# GitHub looks in this specific folder automatically.
+#
+# HOW TO READ THIS FILE?
+# YAML format: uses spaces (not tabs!) for indentation.
+# Each level of indentation = child of parent above it.
+# ============================================================
+
+# ─── NAME ────────────────────────────────────────────────────
+# This is just a label. Shows up in GitHub under "Actions" tab.
+name: 🎭 Playwright E2E Tests
+
+# ─── TRIGGERS: WHEN DOES THIS RUN? ───────────────────────────
+# "on" = "run this workflow when..."
 on:
+  
+  # Trigger 1: When you PUSH code to these branches
   push:
-    branches: [ main, master ]
+    branches: 
+      - main          # Most common branch name
+      - master        # Older default branch name
+      - develop       # If you use a develop branch
+  
+  # Trigger 2: When someone creates a Pull Request
+  # (A Pull Request = "I want to merge my changes into main")
   pull_request:
-    branches: [ main, master ]
+    branches: 
+      - main
+      - master
+  
+  # Trigger 3: Run manually from GitHub website
+  # Go to Actions tab → select this workflow → "Run workflow" button
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Which tests to run?'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all         # Run everything
+          - smoke       # Only @smoke tagged tests
+          - regression  # Only @regression tagged tests
+
+# ─── ENVIRONMENT VARIABLES ───────────────────────────────────
+# These variables are available to ALL jobs below.
+# ${{ secrets.SOMETHING }} = reads from GitHub Secrets (your safe/vault)
+# NEVER put real passwords here - use secrets!
+env:
+  ISSI_GMS_URL: ${{ secrets.ISSI_GMS_URL }}
+  STAFF_USERNAME: ${{ secrets.STAFF_USERNAME }}
+  STAFF_PASSWORD: ${{ secrets.STAFF_PASSWORD }}
+  ORG_USERNAME: ${{ secrets.ORG_USERNAME }}
+  ORG_PASSWORD: ${{ secrets.ORG_PASSWORD }}
+  ORG_NAME: ${{ secrets.ORG_NAME }}
+  IND_USERNAME: ${{ secrets.IND_USERNAME }}
+  IND_PASSWORD: ${{ secrets.IND_PASSWORD }}
+  HEADLESS: 'true'    # Always run headless in CI (no browser window)
+  DEBUG: 'false'      # No debug output in CI
+  NODE_ENV: 'ci'      # Tells your app "we're in CI mode"
+
+# ─── JOBS: WHAT WORK TO DO ───────────────────────────────────
+# Jobs are groups of steps.
+# Multiple jobs CAN run in parallel (at the same time).
 jobs:
-  test:
-    timeout-minutes: 60
+
+  # ════════════════════════════════════════════════════════════
+  # JOB 1: RUN PLAYWRIGHT TESTS
+  # ════════════════════════════════════════════════════════════
+  playwright-tests:
+    
+    # Human-readable name shown in GitHub
+    name: 🧪 Run Playwright Tests
+    
+    # What machine to use?
+    # "ubuntu-latest" = a fresh Linux computer provided by GitHub for FREE
+    # This computer has nothing installed yet - we install everything below
     runs-on: ubuntu-latest
+    
+    # Kill the job if it runs longer than 60 minutes
+    # Prevents runaway tests from wasting GitHub's resources
+    timeout-minutes: 60
+    
+    # ── STEPS: One-by-one instructions ──────────────────────
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+
+      # STEP 1: Download your code onto the robot's computer
+      # Without this, the robot has no code to work with!
+      # actions/checkout = a pre-built tool from GitHub
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        # This downloads your entire project to the robot's computer
+
+      # STEP 2: Install Node.js (JavaScript runtime)
+      # Your project uses TypeScript/JavaScript, which needs Node.js
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'    # Use Node.js version 20 (stable)
+          # cache: 'npm' saves packages between runs (FASTER!)
+          # Instead of downloading packages every time, it reuses cached ones
+          cache: 'npm'
+
+      # STEP 3: Install your project's packages
+      # "npm ci" = like "npm install" but:
+      #   - Faster (uses lock file exactly)
+      #   - Cleaner (deletes node_modules first)
+      #   - Safer for CI (doesn't update package-lock.json)
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      # STEP 4: Install the actual browser programs
+      # Playwright needs real browsers: Chrome, Firefox, Safari
+      # --with-deps also installs Linux system libraries the browsers need
+      - name: 🌐 Install Playwright Browsers
+        run: npx playwright install chromium --with-deps
+        # We only install chromium (Chrome) to save time and space
+        # Your playwright.config.ts already only uses chromium
+
+      # STEP 5: Create the .env file for your tests
+      # Your tests need environment variables.
+      # In CI, we create the .env file from GitHub Secrets.
+      # "echo" = print text, ">>" = append to file
+      - name: 🔑 Create .env File
+        run: |
+          echo "ISSI_GMS_URL=${{ secrets.ISSI_GMS_URL }}" >> .env
+          echo "STAFF_USERNAME=${{ secrets.STAFF_USERNAME }}" >> .env
+          echo "STAFF_PASSWORD=${{ secrets.STAFF_PASSWORD }}" >> .env
+          echo "ORG_USERNAME=${{ secrets.ORG_USERNAME }}" >> .env
+          echo "ORG_PASSWORD=${{ secrets.ORG_PASSWORD }}" >> .env
+          echo "ORG_NAME=${{ secrets.ORG_NAME }}" >> .env
+          echo "IND_USERNAME=${{ secrets.IND_USERNAME }}" >> .env
+          echo "IND_PASSWORD=${{ secrets.IND_PASSWORD }}" >> .env
+          echo "HEADLESS=true" >> .env
+          echo "DEBUG=false" >> .env
+          echo ".env file created ✅"
+        # Note: The actual secret values are never shown in logs!
+        # GitHub automatically masks them as ***
+
+      # STEP 6: Run your Playwright tests!
+      # This is the main event.
+      - name: 🎭 Run Playwright Tests
+        run: |
+          # Check what type of test to run
+          # ${{ github.event.inputs.test_type }} = the choice from manual trigger
+          # If not manually triggered, defaults to 'all'
+          
+          TEST_TYPE="${{ github.event.inputs.test_type || 'all' }}"
+          
+          if [ "$TEST_TYPE" = "smoke" ]; then
+            echo "Running SMOKE tests only..."
+            npx playwright test --grep @smoke
+          elif [ "$TEST_TYPE" = "regression" ]; then
+            echo "Running REGRESSION tests only..."
+            npx playwright test --grep @regression
+          else
+            echo "Running ALL tests..."
+            npx playwright test
+          fi
+        # "continue-on-error: false" = if tests fail, mark job as FAILED
+        # This is default behavior, shown here for clarity
+
+      # STEP 7: Upload the HTML test report
+      # Even if tests fail, we want to see the report!
+      # "if: always()" = run this step no matter what happened before
+      - name: 📊 Upload Playwright HTML Report
+        uses: actions/upload-artifact@v4
+        if: always()    # ← RUN EVEN IF TESTS FAILED!
+        with:
+          name: playwright-html-report    # Name shown in GitHub
+          path: playwright-report/        # Folder to upload
+          retention-days: 30             # Delete after 30 days
+
+      # STEP 8: Upload test results (raw data)
+      # Useful for other tools that read test results
+      - name: 📋 Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-data
+          path: test-results/
+          retention-days: 7       # Keep raw data for only 7 days
+
+      # STEP 9: Post a summary to GitHub
+      # This creates a nice summary table in the Actions run
+      - name: 📝 Generate Test Summary
+        if: always()
+        run: |
+          echo "## 🎭 Playwright Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Triggered by | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Run ID | ${{ github.run_id }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📎 Download the HTML report from the **Artifacts** section below" >> $GITHUB_STEP_SUMMARY
+          # $GITHUB_STEP_SUMMARY = a special file that becomes visible in GitHub UI
+
+
+  # ════════════════════════════════════════════════════════════
+  # JOB 2: SMOKE TESTS ONLY (faster, runs first)
+  # This runs your @smoke tests as a quick health check
+  # ════════════════════════════════════════════════════════════
+  smoke-check:
+    name: 💨 Quick Smoke Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20    # Smoke tests should be FAST
+    
+    # Only run on push to main/master (not on PRs)
+    if: github.event_name == 'push'
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🌐 Install Playwright Browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: 🔑 Create .env File
+        run: |
+          echo "ISSI_GMS_URL=${{ secrets.ISSI_GMS_URL }}" >> .env
+          echo "STAFF_USERNAME=${{ secrets.STAFF_USERNAME }}" >> .env
+          echo "STAFF_PASSWORD=${{ secrets.STAFF_PASSWORD }}" >> .env
+          echo "ORG_USERNAME=${{ secrets.ORG_USERNAME }}" >> .env
+          echo "ORG_PASSWORD=${{ secrets.ORG_PASSWORD }}" >> .env
+          echo "ORG_NAME=${{ secrets.ORG_NAME }}" >> .env
+          echo "IND_USERNAME=${{ secrets.IND_USERNAME }}" >> .env
+          echo "IND_PASSWORD=${{ secrets.IND_PASSWORD }}" >> .env
+          echo "HEADLESS=true" >> .env
+
+      - name: 💨 Run Smoke Tests Only
+        run: npx playwright test --grep @smoke
+        # Only runs tests tagged with @smoke
+        # These should complete in under 10 minutes
+
+      - name: 📊 Upload Smoke Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-test-report
+          path: playwright-report/
+          retention-days: 7
