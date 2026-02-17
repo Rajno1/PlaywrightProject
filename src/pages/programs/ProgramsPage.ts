@@ -2,6 +2,7 @@ import { Page, Locator } from '@playwright/test';
 import { SharedComponents } from '../base/SharedComponents';
 import { Logger } from '../../utils/logger';
 import { AddNewLinkText, PageHeaders } from '@enums/Enums';
+import { Assertions } from '@utils/assertions';
 
 
 /**
@@ -90,22 +91,6 @@ export class ProgramsPage extends SharedComponents {
 
   get addNewProgramLink(): Locator {
     return this.getAddNewlink(AddNewLinkText.PROGRAM);
-  }
-
-  /* ==================== Page Page Header Verification Methods ==================== */
-
-  /**
-   * verify Program page headder is visible
-   */
-  async verifyProgramHeaderVisibility(): Promise<void> {
-    await this.verifyElementVisible(this.programPageHeader, 'Programs page header');
-  }
-
-  /**
-   * Verify Add New Program button is visible
-   */
-  async verifyAddNewProgramLinkVisibility(): Promise<void> {
-    await this.verifyElementVisible(this.addNewProgramLink, 'Add New Program link');
   }
 
   /* ==================== Filter Methods ==================== */

@@ -21,7 +21,7 @@ test.describe('Programs View Page @programs @list', () => {
 
     await test.step('Page heading should display as "Programs"', async () => {
 
-      await programsPage.verifyProgramHeaderVisibility();
+       await Assertions.verifyElementVisible(programsPage.programPageHeader, 'Programs page header');
       
       await Assertions.verifyElementText(programsPage.programPageHeader,
         PageHeaders.PROGRAMS,
@@ -34,7 +34,7 @@ test.describe('Programs View Page @programs @list', () => {
 
     await test.step('"Add New Program" link is visible', async () => {
 
-      await programsPage.verifyAddNewProgramLinkVisibility();
+      await Assertions.verifyElementVisible(programsPage.addNewProgramLink, 'Add New Program link');
 
       await Assertions.verifyElementText(programsPage.addNewProgramLink,
         AddNewLinkText.PROGRAM,

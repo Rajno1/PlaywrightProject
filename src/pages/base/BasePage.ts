@@ -65,6 +65,14 @@ export class BasePage {
     await this.page.waitForTimeout(milliseconds);
   }
 
+  /**
+   * Check if element is enabled
+   */
+  async isElementEnabled(locator: Locator): Promise<boolean> {
+    await this.waitForElement(locator);
+    return await locator.isEnabled();
+  }
+
   /* ==================== Element Interaction Methods ==================== */
 
   /**
@@ -103,53 +111,7 @@ export class BasePage {
     return await locator.textContent() || '';
   }
 
-  /**
-   * Check if element is visible
-   */
-  async isElementVisible(locator: Locator, timeout: number = 5000): Promise<boolean> {
-    try {
-      await locator.waitFor({ state: 'visible', timeout });
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  /**
-   * Check if element is enabled
-   */
-  async isElementEnabled(locator: Locator): Promise<boolean> {
-    await this.waitForElement(locator);
-    return await locator.isEnabled();
-  }
-
-
-  /* ==================== Assertion Methods ==================== */
-
-  /**
-   * Verify element is visible
-   */
-  async verifyElementVisible(locator: Locator, elementName: string = 'element'): Promise<void> {
-    Logger.info(`Verifying ${elementName} visibility`);
-    await expect(locator).toBeVisible();
-  }
-
-  /**
-   * Verify element text
-   */
-  async verifyElementText(locator: Locator, expectedText: string, elementName: string = 'element'): Promise<void> {
-    Logger.info(`Verifying ${elementName} has text: ${expectedText}`);
-    await expect(locator).toHaveText(expectedText);
-  }
-
-  /**
-   * Verify page URL
-   */
-  async verifyPageUrl(expectedUrl: string): Promise<void> {
-    Logger.info(`Verifying page URL contains: ${expectedUrl}`);
-    await expect(this.page).toHaveURL(new RegExp(expectedUrl));
-  }
-
+  
   /* ==================== Screenshot Methods ==================== */
 
   /**

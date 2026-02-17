@@ -8,29 +8,64 @@ import { Logger } from './logger';
 export class Assertions {
   /**
    * Verify element is visible
+   * 
    */
+
+    /**
+   * Check if element is visible
+   */
+  async isElementVisible(locator: Locator, timeout: number = 5000): Promise<boolean> {
+    try {
+      await locator.waitFor({ state: 'visible', timeout });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  
   static async verifyElementVisible(
     locator: Locator,
     elementName: string,
     timeout: number = 10000
   ): Promise<void> {
-    Logger.info(`Verifying ${elementName} visibility`);
+    try {
+      Logger.info(`Verifying ${elementName} visibility`);
     await expect(locator).toBeVisible({ timeout });
     Logger.success(`${elementName} is visible`);
+    } catch (error) {
+    Logger.error(`${elementName} is not visible`);
+    throw error;
+}
+    
+  }
+
+
+  /* ==================== Assertion Methods ==================== */
+
+  /**
+   * Verify element is visible
+   */
+  async verifyElementVisible(locator: Locator, elementName: string = 'element'): Promise<void> {
+    Logger.info(`Verifying ${elementName} visibility`);
+    await expect(locator).toBeVisible();
   }
 
   /**
-   * Verify element is not visible
+   * Verify element text
    */
-  static async verifyElementNotVisible(
-    locator: Locator,
-    elementName: string,
-    timeout: number = 10000
-  ): Promise<void> {
-    Logger.info(`Verifying ${elementName} is not visible`);
-    await expect(locator).not.toBeVisible({ timeout });
-    Logger.success(`${elementName} is not visible`);
+  async verifyElementText(locator: Locator, expectedText: string, elementName: string = 'element'): Promise<void> {
+    Logger.info(`Verifying ${elementName} has text: ${expectedText}`);
+    await expect(locator).toHaveText(expectedText);
   }
+
+  /**
+   * Verify page URL
+   */
+  async verifyPageUrl(expectedUrl: string): Promise<void> {
+    Logger.info(`Verifying page URL contains: ${expectedUrl}`);
+    await expect(this.page).toHaveURL(new RegExp(expectedUrl));
+  }
+
 
   /**
    * Verify element text
