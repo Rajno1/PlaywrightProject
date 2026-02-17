@@ -292,14 +292,13 @@ export class ProgramsPage extends SharedComponents {
 
   /* ==================== Verification Methods ==================== */
 
-  /**
-   * Verify program exists in table
-   */
-  async verifyProgramExists(programCode: string): Promise<boolean> {
-    const row = this.getProgramRow(programCode);
-    return await this.isElementVisible(row);
-  }
-
+  // /**
+  //  * Verify program exists in table
+  //  */
+  // async verifyProgramExists(programCode: string): Promise<boolean> {
+  //   const row = this.getProgramRow(programCode);
+  //   return await this.isElementVisible(row);
+  // }
   /**
    * Get program count from page info
    */

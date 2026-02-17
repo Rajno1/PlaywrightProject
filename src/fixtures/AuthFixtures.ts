@@ -33,8 +33,28 @@ function ensureAuthDirectoryExists(): void {
 }
 
 /**
+ * Check if the server actually accepted our session
+ * by confirming we landed on dashboard and not redirected away
+ */
+function isSessionValid(page: Page): boolean {
+  const url = page.url();
+  Logger.info(`Session validation — current URL: ${url}`);
+  return url.includes('/profiles/dashboard');
+}
+
+/**
+ * Delete stale auth file so next attempt triggers a fresh login
+ */
+function deleteStaleAuthFile(authFile: string, role: string): void {
+  if (fs.existsSync(authFile)) {
+    fs.unlinkSync(authFile);
+    Logger.info(`Deleted stale auth file for ${role}: ${authFile}`);
+  }
+}
+
+/**
  * Create authenticated page for any role
- * DRY approach - reusable helper
+ * Validates session server-side after loading — re-authenticates if rejected
  */
 async function createAuthenticatedPage(
   browser: any,
@@ -42,38 +62,49 @@ async function createAuthenticatedPage(
   role: 'staff' | 'Organization' | 'individual'
 ): Promise<Page> {
   ensureAuthDirectoryExists();
-  
+
   Logger.info(`Setting up ${role} user fixture`);
-  
+
   const context = await browser.newContext({
     storageState: fs.existsSync(authFile) ? authFile : undefined,
   });
-  
-  const page = await context.newPage();
-  
-  if (!fs.existsSync(authFile)) {
-    Logger.info(`No existing auth found, performing login`);
-  
-    await loginAs(page, role);
-    await context.storageState({ path: authFile });
 
-    Logger.success(`${role} auth state saved`);
-  } else {
-    Logger.info(`Using existing ${role} auth state`);
-  }
-  
+  const page = await context.newPage();
+
+  // Navigate to dashboard — if session is dead server will redirect away
   await page.goto('/profiles/dashboard');
   await page.waitForLoadState('networkidle');
-  
+
+  // ✅ Check if the server actually accepted our session
+  if (!isSessionValid(page)) {
+    Logger.info(`Server rejected session for ${role} — performing fresh login`);
+
+    // Wipe the stale auth file
+    deleteStaleAuthFile(authFile, role);
+
+    // Perform fresh login
+    await loginAs(page, role);
+
+    // Wait until fully landed on dashboard before saving state
+    await page.waitForURL('**/profiles/dashboard', { timeout: 20000 });
+    await page.waitForLoadState('networkidle');
+
+    // Save the fresh valid session
+    await context.storageState({ path: authFile });
+    Logger.success(`Fresh auth state saved for ${role}`);
+  } else {
+    Logger.info(`Session valid for ${role} — reusing existing auth`);
+  }
+
   return page;
 }
 
 /* ==================== FIXTURES ==================== */
 
 export const test = base.extend<Fixtures>({
-  
+
   /* -------- AUTHENTICATION FIXTURES -------- */
-  
+
   staffPage: async ({ browser }, use) => {
     const page = await createAuthenticatedPage(
       browser,
@@ -108,7 +139,7 @@ export const test = base.extend<Fixtures>({
   },
 
   /* -------- PAGE OBJECT FIXTURES -------- */
-  
+
   programsPage: async ({ staffPage }, use) => {
     await use(new ProgramsPage(staffPage));
   },
