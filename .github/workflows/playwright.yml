@@ -230,7 +230,7 @@ jobs:
         run: npm ci
 
       - name: 🌐 Install Playwright Browsers
-        run: npx playwright install chromium --with-deps
+        run: npx playwright install --with-deps
 
       - name: 🔑 Create .env File
         run: |
@@ -245,7 +245,7 @@ jobs:
           echo "HEADLESS=true" >> .env
 
       - name: 💨 Run Smoke Tests
-        run: npx playwright test --project=chromium --grep @smoke --retries=2
+        run: npx playwright test --grep @smoke --retries=2
 
       - name: 📊 Upload Report
         uses: actions/upload-artifact@v4
