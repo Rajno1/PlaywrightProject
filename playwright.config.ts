@@ -88,31 +88,30 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    {
-      name: 'chromium',
-      use: { 
-        ...devices['Desktop Chrome'],
-        // Custom browser context options for Chrome
-        launchOptions: {
-          args: ['--start-maximized']
-        }
-      },
+  {
+    name: 'chromium',
+    use: { 
+      ...devices['Desktop Chrome'],
+      launchOptions: {
+        args: ['--start-maximized']
+      }
     },
+  },
 
-    // {
-    //   name: 'firefox',
-    //   use: { 
-    //     ...devices['Desktop Firefox'] 
-    //   },
-    // },
+  {
+    name: 'firefox',
+    use: { 
+      ...devices['Desktop Firefox'] 
+    },
+  },
 
-    // {
-    //   name: 'webkit',
-    //   use: { 
-    //     ...devices['Desktop Safari'] 
-    //   },
-    // },
-
+  {
+    name: 'webkit',
+    use: { 
+      ...devices['Desktop Safari'] 
+    },
+  },
+],
     // /* Test against mobile viewports. */
     // {
     //   name: 'Mobile Chrome',
@@ -143,8 +142,9 @@ export default defineConfig({
     //     ...devices['Desktop Chrome'], 
     //     channel: 'chrome' 
     //   },
+    
     // },
-  ],
+  //],
 
   /* Run your local dev server before starting the tests */
   // webServer: {
