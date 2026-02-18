@@ -245,7 +245,7 @@ jobs:
           echo "HEADLESS=true" >> .env
 
       - name: 💨 Run Smoke Tests
-        run: npx playwright test --grep @smoke --retries=2
+        run: npx playwright test --project=chromium --grep @smoke --retries=2
 
       - name: 📊 Upload Report
         uses: actions/upload-artifact@v4
