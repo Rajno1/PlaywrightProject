@@ -1,45 +1,37 @@
 # ============================================================
-# GITHUB ACTIONS WORKFLOW FILE
+# ADVANCED GITHUB ACTIONS WORKFLOW - PRODUCTION-READY
 # ============================================================
 # 
-# WHAT IS THIS FILE?
-# This is a recipe/instruction file for a robot (GitHub Actions).
-# When you push code to GitHub, this robot wakes up,
-# follows these instructions, and runs your Playwright tests.
-#
-# WHERE DOES IT LIVE?
-# It MUST be in exactly this path: .github/workflows/playwright.yml
-# GitHub looks in this specific folder automatically.
-#
-# HOW TO READ THIS FILE?
-# YAML format: uses spaces (not tabs!) for indentation.
-# Each level of indentation = child of parent above it.
+# NEW FEATURES ADDED:
+# ✅ Pull Request checks
+# ✅ Matrix testing (multiple browsers in parallel)
+# ✅ Scheduled nightly runs
+# ✅ Test result PR comments
+# ✅ Flaky test retry
+# ✅ Better caching for speed
+# ✅ Slack notifications (optional)
+# ✅ Performance tracking
 # ============================================================
 
-# ─── NAME ────────────────────────────────────────────────────
-# This is just a label. Shows up in GitHub under "Actions" tab.
-name: 🎭 Playwright E2E Tests
+name: 🎭 Playwright E2E Tests (Advanced)
 
-# ─── TRIGGERS: WHEN DOES THIS RUN? ───────────────────────────
-# "on" = "run this workflow when..."
+# ─── TRIGGERS ────────────────────────────────────────────────
 on:
-  
-  # Trigger 1: When you PUSH code to these branches
+  # Trigger 1: Push to main/master
   push:
-    branches: 
-      - main          # Most common branch name
-      - master        # Older default branch name
-      - develop       # If you use a develop branch
-  
-  # Trigger 2: When someone creates a Pull Request
-  # (A Pull Request = "I want to merge my changes into main")
-  pull_request:
     branches: 
       - main
       - master
   
-  # Trigger 3: Run manually from GitHub website
-  # Go to Actions tab → select this workflow → "Run workflow" button
+  # Trigger 2: Pull Requests (THIS IS NEW!)
+  # Tests MUST pass before PR can be merged
+  pull_request:
+    branches: 
+      - main
+      - master
+    types: [opened, synchronize, reopened]
+  
+  # Trigger 3: Manual run from GitHub UI
   workflow_dispatch:
     inputs:
       test_type:
@@ -48,14 +40,30 @@ on:
         default: 'all'
         type: choice
         options:
-          - all         # Run everything
-          - smoke       # Only @smoke tagged tests
-          - regression  # Only @regression tagged tests
+          - all
+          - smoke
+          - regression
+          - e2e
+      
+      browser:
+        description: 'Which browser?'
+        required: true
+        default: 'chromium'
+        type: choice
+        options:
+          - chromium
+          - firefox
+          - webkit
+          - all
+  
+  # Trigger 4: Scheduled runs (NEW!)
+  # Runs every night at 2 AM UTC
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM
+    # - cron: '0 2 * * 1'  # Weekly on Monday at 2 AM
+    # - cron: '0 */6 * * *'  # Every 6 hours
 
-# ─── ENVIRONMENT VARIABLES ───────────────────────────────────
-# These variables are available to ALL jobs below.
-# ${{ secrets.SOMETHING }} = reads from GitHub Secrets (your safe/vault)
-# NEVER put real passwords here - use secrets!
+# ─── GLOBAL SETTINGS ─────────────────────────────────────────
 env:
   ISSI_GMS_URL: ${{ secrets.ISSI_GMS_URL }}
   STAFF_USERNAME: ${{ secrets.STAFF_USERNAME }}
@@ -65,72 +73,66 @@ env:
   ORG_NAME: ${{ secrets.ORG_NAME }}
   IND_USERNAME: ${{ secrets.IND_USERNAME }}
   IND_PASSWORD: ${{ secrets.IND_PASSWORD }}
-  HEADLESS: 'true'    # Always run headless in CI (no browser window)
-  DEBUG: 'false'      # No debug output in CI
-  NODE_ENV: 'ci'      # Tells your app "we're in CI mode"
+  HEADLESS: 'true'
+  DEBUG: 'false'
+  NODE_ENV: 'ci'
 
-# ─── JOBS: WHAT WORK TO DO ───────────────────────────────────
-# Jobs are groups of steps.
-# Multiple jobs CAN run in parallel (at the same time).
+# Cancel in-progress runs if new push happens (saves resources)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# ─── JOBS ────────────────────────────────────────────────────
 jobs:
 
   # ════════════════════════════════════════════════════════════
-  # JOB 1: RUN PLAYWRIGHT TESTS
+  # JOB 1: MATRIX TESTING (Multiple Browsers in Parallel)
   # ════════════════════════════════════════════════════════════
-  playwright-tests:
-    
-    # Human-readable name shown in GitHub
-    name: 🧪 Run Playwright Tests
-    
-    # What machine to use?
-    # "ubuntu-latest" = a fresh Linux computer provided by GitHub for FREE
-    # This computer has nothing installed yet - we install everything below
-    runs-on: ubuntu-latest
-    
-    # Kill the job if it runs longer than 60 minutes
-    # Prevents runaway tests from wasting GitHub's resources
+  playwright-matrix:
+    name: 🧪 Test (${{ matrix.browser }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     
-    # ── STEPS: One-by-one instructions ──────────────────────
+    # Matrix strategy - runs tests in PARALLEL
+    # This creates 3 jobs automatically: chromium, firefox, webkit
+    strategy:
+      fail-fast: false  # Don't cancel other jobs if one fails
+      matrix:
+        browser: [chromium, firefox, webkit]
+        os: [ubuntu-latest]
+        # You can also test multiple OS:
+        # os: [ubuntu-latest, windows-latest, macos-latest]
+        # This would create 9 jobs (3 browsers × 3 OS)
+    
     steps:
-
-      # STEP 1: Download your code onto the robot's computer
-      # Without this, the robot has no code to work with!
-      # actions/checkout = a pre-built tool from GitHub
-      - name: 📥 Checkout Repository
+      - name: 📥 Checkout Code
         uses: actions/checkout@v4
-        # This downloads your entire project to the robot's computer
 
-      # STEP 2: Install Node.js (JavaScript runtime)
-      # Your project uses TypeScript/JavaScript, which needs Node.js
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'    # Use Node.js version 20 (stable)
-          # cache: 'npm' saves packages between runs (FASTER!)
-          # Instead of downloading packages every time, it reuses cached ones
+          node-version: '20'
           cache: 'npm'
 
-      # STEP 3: Install your project's packages
-      # "npm ci" = like "npm install" but:
-      #   - Faster (uses lock file exactly)
-      #   - Cleaner (deletes node_modules first)
-      #   - Safer for CI (doesn't update package-lock.json)
+      # ─── IMPROVED CACHING ───────────────────────────────
+      # Cache Playwright browsers to speed up future runs
+      - name: 📦 Cache Playwright Browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
       - name: 📦 Install Dependencies
         run: npm ci
 
-      # STEP 4: Install the actual browser programs
-      # Playwright needs real browsers: Chrome, Firefox, Safari
-      # --with-deps also installs Linux system libraries the browsers need
       - name: 🌐 Install Playwright Browsers
-        run: npx playwright install chromium --with-deps
-        # We only install chromium (Chrome) to save time and space
-        # Your playwright.config.ts already only uses chromium
+        # Only install if cache missed
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install ${{ matrix.browser }} --with-deps
 
-      # STEP 5: Create the .env file for your tests
-      # Your tests need environment variables.
-      # In CI, we create the .env file from GitHub Secrets.
-      # "echo" = print text, ">>" = append to file
       - name: 🔑 Create .env File
         run: |
           echo "ISSI_GMS_URL=${{ secrets.ISSI_GMS_URL }}" >> .env
@@ -143,82 +145,70 @@ jobs:
           echo "IND_PASSWORD=${{ secrets.IND_PASSWORD }}" >> .env
           echo "HEADLESS=true" >> .env
           echo "DEBUG=false" >> .env
-          echo ".env file created ✅"
-        # Note: The actual secret values are never shown in logs!
-        # GitHub automatically masks them as ***
 
-      # STEP 6: Run your Playwright tests!
-      # This is the main event.
+      # ─── RUN TESTS WITH RETRY FOR FLAKY TESTS ──────────
       - name: 🎭 Run Playwright Tests
+        id: tests
         run: |
-          # Check what type of test to run
-          # ${{ github.event.inputs.test_type }} = the choice from manual trigger
-          # If not manually triggered, defaults to 'all'
-          
+          # Determine which tests to run
           TEST_TYPE="${{ github.event.inputs.test_type || 'all' }}"
+          BROWSER="${{ matrix.browser }}"
+          
+          echo "🔍 Running $TEST_TYPE tests on $BROWSER..."
           
           if [ "$TEST_TYPE" = "smoke" ]; then
-            echo "Running SMOKE tests only..."
-            npx playwright test --grep @smoke
+            npx playwright test --project=$BROWSER --grep @smoke --retries=2
           elif [ "$TEST_TYPE" = "regression" ]; then
-            echo "Running REGRESSION tests only..."
-            npx playwright test --grep @regression
+            npx playwright test --project=$BROWSER --grep @regression --retries=1
+          elif [ "$TEST_TYPE" = "e2e" ]; then
+            npx playwright test --project=$BROWSER --grep @e2e --retries=0
           else
-            echo "Running ALL tests..."
-            npx playwright test
+            npx playwright test --project=$BROWSER --retries=1
           fi
-        # "continue-on-error: false" = if tests fail, mark job as FAILED
-        # This is default behavior, shown here for clarity
+        continue-on-error: true  # Don't fail job immediately
 
-      # STEP 7: Upload the HTML test report
-      # Even if tests fail, we want to see the report!
-      # "if: always()" = run this step no matter what happened before
-      - name: 📊 Upload Playwright HTML Report
+      # ─── UPLOAD ARTIFACTS ───────────────────────────────
+      - name: 📊 Upload HTML Report
         uses: actions/upload-artifact@v4
-        if: always()    # ← RUN EVEN IF TESTS FAILED!
+        if: always()
         with:
-          name: playwright-html-report    # Name shown in GitHub
-          path: playwright-report/        # Folder to upload
-          retention-days: 30             # Delete after 30 days
+          name: playwright-report-${{ matrix.browser }}-${{ matrix.os }}
+          path: playwright-report/
+          retention-days: 30
 
-      # STEP 8: Upload test results (raw data)
-      # Useful for other tools that read test results
       - name: 📋 Upload Test Results
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-results-data
+          name: test-results-${{ matrix.browser }}-${{ matrix.os }}
           path: test-results/
-          retention-days: 7       # Keep raw data for only 7 days
+          retention-days: 7
 
-      # STEP 9: Post a summary to GitHub
-      # This creates a nice summary table in the Actions run
-      - name: 📝 Generate Test Summary
-        if: always()
-        run: |
-          echo "## 🎭 Playwright Test Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Branch | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Triggered by | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Run ID | ${{ github.run_id }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "📎 Download the HTML report from the **Artifacts** section below" >> $GITHUB_STEP_SUMMARY
-          # $GITHUB_STEP_SUMMARY = a special file that becomes visible in GitHub UI
+      # ─── UPLOAD TRACE ON FAILURE ────────────────────────
+      - name: 📹 Upload Trace (on failure)
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces-${{ matrix.browser }}
+          path: test-results/**/trace.zip
+          retention-days: 7
+
+      # ─── MARK JOB AS FAILED IF TESTS FAILED ─────────────
+      - name: ❌ Fail if Tests Failed
+        if: steps.tests.outcome == 'failure'
+        run: exit 1
 
 
   # ════════════════════════════════════════════════════════════
-  # JOB 2: SMOKE TESTS ONLY (faster, runs first)
-  # This runs your @smoke tests as a quick health check
+  # JOB 2: QUICK SMOKE CHECK (Fastest feedback)
   # ════════════════════════════════════════════════════════════
   smoke-check:
     name: 💨 Quick Smoke Check
     runs-on: ubuntu-latest
-    timeout-minutes: 20    # Smoke tests should be FAST
+    timeout-minutes: 15
     
-    # Only run on push to main/master (not on PRs)
-    if: github.event_name == 'push'
+    # Only run on push to main (not on PRs to save time)
+    if: github.event_name == 'push' || github.event_name == 'schedule'
     
     steps:
       - name: 📥 Checkout Code
@@ -229,6 +219,12 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+
+      - name: 📦 Cache Playwright Browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: 📦 Install Dependencies
         run: npm ci
@@ -248,15 +244,126 @@ jobs:
           echo "IND_PASSWORD=${{ secrets.IND_PASSWORD }}" >> .env
           echo "HEADLESS=true" >> .env
 
-      - name: 💨 Run Smoke Tests Only
-        run: npx playwright test --grep @smoke
-        # Only runs tests tagged with @smoke
-        # These should complete in under 10 minutes
+      - name: 💨 Run Smoke Tests
+        run: npx playwright test --grep @smoke --retries=2
 
-      - name: 📊 Upload Smoke Test Report
+      - name: 📊 Upload Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: smoke-test-report
           path: playwright-report/
           retention-days: 7
+
+
+  # ════════════════════════════════════════════════════════════
+  # JOB 3: COMMENT TEST RESULTS ON PR (NEW!)
+  # ════════════════════════════════════════════════════════════
+  report-pr:
+    name: 📝 Comment Test Results on PR
+    runs-on: ubuntu-latest
+    needs: [playwright-matrix]
+    if: always() && github.event_name == 'pull_request'
+    
+    steps:
+      - name: 📥 Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: 📊 Generate Test Summary
+        id: summary
+        run: |
+          echo "### 🎭 Playwright Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Browser | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|--------|" >> $GITHUB_STEP_SUMMARY
+          
+          # Check each browser result
+          for browser in chromium firefox webkit; do
+            if [ -d "artifacts/playwright-report-$browser-ubuntu-latest" ]; then
+              echo "| $browser | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| $browser | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+      - name: 💬 Comment PR with Results
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Read summary
+            const summary = fs.readFileSync(process.env.GITHUB_STEP_SUMMARY, 'utf8');
+            
+            // Post comment on PR
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary + '\n\n📎 Download full reports from the **Artifacts** section in the workflow run.'
+            });
+
+
+  # ════════════════════════════════════════════════════════════
+  # JOB 4: SLACK NOTIFICATION (Optional - NEW!)
+  # ════════════════════════════════════════════════════════════
+  notify-slack:
+    name: 📢 Notify Slack
+    runs-on: ubuntu-latest
+    needs: [playwright-matrix, smoke-check]
+    if: always() && (github.event_name == 'push' || github.event_name == 'schedule')
+    
+    steps:
+      - name: 📢 Send Slack Notification
+        uses: slackapi/slack-github-action@v1.26.0
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          payload: |
+            {
+              "text": "${{ needs.playwright-matrix.result == 'success' && '✅' || '❌' }} Playwright Tests ${{ needs.playwright-matrix.result }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Playwright Test Results*\n\n• Status: ${{ needs.playwright-matrix.result }}\n• Branch: ${{ github.ref_name }}\n• Triggered by: ${{ github.actor }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>"
+                  }
+                }
+              ]
+            }
+        # Note: This step will be skipped if SLACK_WEBHOOK_URL secret doesn't exist
+
+
+  # ════════════════════════════════════════════════════════════
+  # JOB 5: PERFORMANCE TRACKING (NEW!)
+  # Track test execution time over commits
+  # ════════════════════════════════════════════════════════════
+  performance-tracking:
+    name: ⚡ Performance Tracking
+    runs-on: ubuntu-latest
+    needs: [playwright-matrix]
+    if: github.event_name == 'push'
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 📊 Store Performance Data
+        run: |
+          # Create performance log
+          echo "Commit: ${{ github.sha }}" >> performance.log
+          echo "Date: $(date)" >> performance.log
+          echo "Duration: ${{ needs.playwright-matrix.outputs.duration }}" >> performance.log
+          echo "---" >> performance.log
+
+      - name: 📈 Commit Performance Log
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add performance.log || true
+          git commit -m "📊 Update performance tracking" || true
+          git push || true

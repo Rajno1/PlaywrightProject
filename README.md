@@ -1,5 +1,10 @@
 # 🎭 Playwright Test Automation Framework
 
+![Playwright Tests](https://github.com/Rajno1/PlaywrightProject/actions/workflows/playwright.yml/badge.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
+![Playwright](https://img.shields.io/badge/Playwright-1.57.0-45ba4b?logo=playwright&logoColor=white)
+![License](https://img.shields.io/badge/license-ISC-blue)
+
 ## 📖 Table of Contents
 1. [What is This Framework?](#what-is-this-framework)
 2. [Simple Explanation (Non-Technical)](#simple-explanation-non-technical)
