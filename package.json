@@ -4,42 +4,81 @@
   "description": "Playwright Test Automation Framework for ISSI GMS Application",
   "main": "index.js",
   "scripts": {
-
+    
+    /* ==================== PRE-TEST HOOKS ==================== */
+    
+    "pretest": "npm run clean:full",
+    "pretest:headed": "npm run clean:full",
+    "pretest:smoke": "npm run clean:full",
+    "pretest:regression": "npm run clean:full",
+    "pretest:programs": "npm run clean:full",
+    "pretest:ci": "npm run clean:full",
+    
+    /* ==================== MAIN TEST COMMANDS ==================== */
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
     "test:ui": "playwright test --ui",
     
+    /* ==================== BROWSER-SPECIFIC ==================== */
     "test:chrome": "playwright test --project=chromium",
     "test:firefox": "playwright test --project=firefox",
     "test:webkit": "playwright test --project=webkit",
     
+    /* ==================== PARALLEL/SERIAL ==================== */
     "test:parallel": "playwright test --workers=4",
     "test:serial": "playwright test --workers=1",
     
+    /* ==================== TAG-BASED TESTS ==================== */
     "test:smoke": "playwright test --grep @smoke",
     "test:regression": "playwright test --grep @regression",
     "test:negative": "playwright test --grep @negative",
     "test:e2e": "playwright test --grep @e2e",
     "test:programs": "playwright test --grep @programs",
+    "test:grants": "playwright test --grep @grants",
     "test:tag": "playwright test --grep",
-
+    
+    /* ==================== SPECIAL RUNS ==================== */
+    
+    "test:quick": "playwright test --project=chromium --grep @smoke --workers=1",
+    "test:reuse-sessions": "npm run clean:reports && playwright test",
+    
+    /* ==================== REPORTING ==================== */
     "report": "playwright show-report",
     "report:html": "playwright show-report playwright-report",
+    "report:open": "open playwright-report/index.html",
     
     "allure:generate": "allure generate ./allure-results --clean -o ./allure-report",
     "allure:open": "allure open ./allure-report",
     "allure:serve": "allure serve ./allure-results",
+    "allure:clean": "rimraf allure-results allure-report",
     
-    "clean": "rm -rf test-results playwright-report allure-results allure-report",
-    "clean:auth": "rm -rf .auth/*.json",
-    "clean:all": "rm -rf test-results playwright-report allure-results allure-report .auth node_modules package-lock.json",
+    /* ==================== CLEANUP COMMANDS ==================== */
     
+    "clean:reports": "rimraf test-results playwright-report allure-results allure-report",
+    "clean:auth": "rimraf .auth",
+    "clean:full": "npm run clean:reports && npm run clean:auth",
+    "clean:all": "rimraf test-results playwright-report allure-results allure-report .auth",
+    "clean:nuclear": "rimraf test-results playwright-report allure-results allure-report .auth node_modules package-lock.json",
+    
+    /* ==================== SETUP ==================== */
     "setup": "npm install && npx playwright install --with-deps",
-    "setup:ci": "npm ci && npx playwright install chromium --with-deps",
+    "setup:ci": "npm ci && npx playwright install --with-deps",
+    "postinstall": "npx playwright install chromium",
     
-    "ci": "npm run clean && playwright test",
-    "ci:smoke": "npm run clean && playwright test --grep @smoke"
+    /* ==================== CI COMMANDS ==================== */
+    "ci": "npm run clean:all && playwright test",
+    "ci:smoke": "npm run clean:all && playwright test --grep @smoke",
+    "ci:regression": "npm run clean:all && playwright test --grep @regression",
+    "ci:all-browsers": "npm run clean:all && CI=true playwright test",
+    
+    /* ==================== VALIDATION ==================== */
+    "validate:env": "node -e \"require('dotenv').config(); const required = ['ISSI_GMS_URL', 'STAFF_USERNAME', 'STAFF_PASSWORD', 'ORG_USERNAME', 'ORG_PASSWORD', 'ORG_NAME', 'IND_USERNAME', 'IND_PASSWORD']; const missing = required.filter(v => !process.env[v]); if (missing.length) { console.error('Missing env vars:', missing); process.exit(1); } console.log('✅ All env vars present');\"",
+    
+    /* ==================== UTILITIES ==================== */
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write \"**/*.{ts,json,md}\"",
+    "type-check": "tsc --noEmit"
   },
   "keywords": [
     "playwright",
@@ -54,7 +93,8 @@
   "devDependencies": {
     "@playwright/test": "^1.57.0",
     "@types/node": "^25.0.3",
-    "allure-playwright": "^3.4.5"
+    "allure-playwright": "^3.4.5",
+    "rimraf": "^6.0.1"
   },
   "dependencies": {
     "allure-commandline": "^2.36.0",
