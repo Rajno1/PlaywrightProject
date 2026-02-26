@@ -24,6 +24,11 @@ export enum SubMenu {
   MASTER_FUNDING_SOURCES = 'Master Funding Sources'
 }
 
+export enum DashboardTitles {
+  STAFF_DASHBOARD_TITLE = 'Internal Portal',
+  ORGANIZATION_DASHBOARD_TITLE = 'Organization Portal',
+  INDIVIDUAL_DASHBOARD_TITLE = 'Individual Portal'
+}
 
 export enum PageHeaders {
   DASHBOARD = 'Dashboard',

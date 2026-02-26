@@ -1,12 +1,14 @@
 import { Page, Locator } from '@playwright/test'; // absolute minimum imports for page object
 import { BasePage } from '../base/BasePage'; // Relative import for BasePage,
 import { Logger } from '@utils/logger';
+import { SharedComponents } from '@pages/base/SharedComponents';
+import { DashboardTitles } from '@enums/Enums';
 
 /**
  * Login Page Object
  * Handles all login-related actions
  */
-export class LoginPage extends BasePage {
+export class LoginPage extends SharedComponents {
   // Locators
   readonly loginButton: Locator;
   readonly staffPortalLoginLink: Locator;
@@ -41,14 +43,15 @@ export class LoginPage extends BasePage {
     await this.navigateTo('/pages/public');
   }
 
-  /* ==================== Verification Methods ==================== */
 
-  /**
-   * Check if login button is visible
-   */
-  // async isLoginVisible(): Promise<boolean> {
-  //   return await this.isElementVisible(this.loginButton);
-  // }
+
+  /* ==================== Get Dashboard Titles Methods ==================== */
+
+   get StaffDashboardHeader(): Locator {
+    return this.getDashboardTitle(DashboardTitles.STAFF_DASHBOARD_TITLE);
+  }
+
+
 
   /* ==================== Action Methods ==================== */
 

@@ -12,9 +12,19 @@ import { EditProgramPage } from '@pages/programs/EditProgramPage';
 
 /* ==================== TYPES ==================== */
 type Fixtures = {
+  // ✅ Authenticated fixtures (with session)
   staffPage: Page;
   orgPage: Page;
   individualPage: Page;
+  
+  // ✅ Guest fixtures (no session - for registration/login tests)
+  guestPage: Page;
+  staffGuestPage: Page;
+  orgGuestPage: Page;
+  individualGuestPage: Page;
+  
+  // ✅ Page objects
+  loginPage: LoginPage;
   programsPage: ProgramsPage;
   addProgramPage: AddProgramPage;
   editProgramPage: EditProgramPage;
@@ -22,9 +32,6 @@ type Fixtures = {
 
 /* ==================== HELPER FUNCTIONS ==================== */
 
-/**
- * Ensure auth directory exists
- */
 function ensureAuthDirectoryExists(): void {
   if (!fs.existsSync(Paths.AUTH_FOLDER_PATH)) {
     fs.mkdirSync(Paths.AUTH_FOLDER_PATH, { recursive: true });
@@ -32,29 +39,35 @@ function ensureAuthDirectoryExists(): void {
   }
 }
 
-/**
- * Check if the server actually accepted our session
- * by confirming we landed on dashboard and not redirected away
- */
 function isSessionValid(page: Page): boolean {
   const url = page.url();
-  Logger.info(`Session validation — current URL: ${url}`);
-  return url.includes('/profiles/dashboard');
+  const isValid = url.includes('/profiles/dashboard');
+  Logger.info(`Session validation: ${isValid ? '✅ Valid' : '❌ Invalid'} - URL: ${url}`);
+  return isValid;
 }
 
-/**
- * Delete stale auth file so next attempt triggers a fresh login
- */
+function hasValidCookies(authFile: string): boolean {
+  if (!fs.existsSync(authFile)) return false;
+  
+  try {
+    const content = JSON.parse(fs.readFileSync(authFile, 'utf8'));
+    const cookieCount = content.cookies?.length || 0;
+    Logger.info(`Session file has ${cookieCount} cookies`);
+    return cookieCount > 0;
+  } catch {
+    return false;
+  }
+}
+
 function deleteStaleAuthFile(authFile: string, role: string): void {
   if (fs.existsSync(authFile)) {
     fs.unlinkSync(authFile);
-    Logger.info(`Deleted stale auth file for ${role}: ${authFile}`);
+    Logger.info(`🗑️  Deleted stale auth file for ${role}`);
   }
 }
 
 /**
- * Create authenticated page for any role
- * Validates session server-side after loading — re-authenticates if rejected
+ * Create authenticated page (with stored session)
  */
 async function createAuthenticatedPage(
   browser: any,
@@ -63,39 +76,64 @@ async function createAuthenticatedPage(
 ): Promise<Page> {
   ensureAuthDirectoryExists();
 
-  Logger.info(`Setting up ${role} user fixture`);
+  Logger.info(`⚙️  Setting up AUTHENTICATED ${role} user`);
+
+  const hasSession = hasValidCookies(authFile);
+  
+  if (hasSession) {
+    Logger.info(`📂 Found existing ${role} session file`);
+  } else {
+    Logger.info(`📂 No valid ${role} session found`);
+  }
 
   const context = await browser.newContext({
-    storageState: fs.existsSync(authFile) ? authFile : undefined,
+    storageState: hasSession ? authFile : undefined,
   });
 
   const page = await context.newPage();
 
-  // Navigate to dashboard — if session is dead server will redirect away
-  await page.goto('/profiles/dashboard');
-  await page.waitForLoadState('networkidle');
+  await page.goto('/profiles/dashboard', { 
+    waitUntil: 'networkidle',
+    timeout: 20000 
+  });
 
-  // ✅ Check if the server actually accepted our session
   if (!isSessionValid(page)) {
-    Logger.info(`Server rejected session for ${role} — performing fresh login`);
+    Logger.warn(`⚠️  Server rejected ${role} session - performing fresh login`);
 
-    // Wipe the stale auth file
     deleteStaleAuthFile(authFile, role);
 
-    // Perform fresh login
     await loginAs(page, role);
 
-    // Wait until fully landed on dashboard before saving state
     await page.waitForURL('**/profiles/dashboard', { timeout: 20000 });
     await page.waitForLoadState('networkidle');
 
-    // Save the fresh valid session
     await context.storageState({ path: authFile });
-    Logger.success(`Fresh auth state saved for ${role}`);
+    Logger.success(`✅ Fresh ${role} session saved`);
   } else {
-    Logger.info(`Session valid for ${role} — reusing existing auth`);
+    Logger.success(`✅ Reusing valid ${role} session`);
   }
 
+  return page;
+}
+
+/**
+ * Create guest page (no session - for registration/login tests)
+ */
+async function createGuestPage(browser: any): Promise<Page> {
+  Logger.info(`⚙️  Setting up GUEST page (no authentication)`);
+  
+  // ✅ Create context WITHOUT any stored session
+  const context = await browser.newContext({
+    // NO storageState - fresh browser session
+  });
+
+  const page = await context.newPage();
+  
+  // ✅ Go to public homepage (not dashboard)
+  await page.goto('/', { waitUntil: 'networkidle' });
+  
+  Logger.success(`✅ Guest page ready (unauthenticated)`);
+  
   return page;
 }
 
@@ -103,7 +141,7 @@ async function createAuthenticatedPage(
 
 export const test = base.extend<Fixtures>({
 
-  /* -------- AUTHENTICATION FIXTURES -------- */
+  /* ==================== AUTHENTICATED FIXTURES ==================== */
 
   staffPage: async ({ browser }, use) => {
     const page = await createAuthenticatedPage(
@@ -113,7 +151,7 @@ export const test = base.extend<Fixtures>({
     );
     await use(page);
     await page.context().close();
-    Logger.info('Staff user fixture cleaned up');
+    Logger.info('🧹 Staff user fixture cleaned up');
   },
 
   orgPage: async ({ browser }, use) => {
@@ -124,7 +162,7 @@ export const test = base.extend<Fixtures>({
     );
     await use(page);
     await page.context().close();
-    Logger.info('Organization user fixture cleaned up');
+    Logger.info('🧹 Organization user fixture cleaned up');
   },
 
   individualPage: async ({ browser }, use) => {
@@ -135,10 +173,69 @@ export const test = base.extend<Fixtures>({
     );
     await use(page);
     await page.context().close();
-    Logger.info('Individual user fixture cleaned up');
+    Logger.info('🧹 Individual user fixture cleaned up');
   },
 
-  /* -------- PAGE OBJECT FIXTURES -------- */
+  /* ==================== GUEST FIXTURES (NO SESSION) ==================== */
+
+  /**
+   * Generic guest page - no authentication
+   * Use for: Registration tests, login tests, public page tests
+   */
+  guestPage: async ({ browser }, use) => {
+    const page = await createGuestPage(browser);
+    await use(page);
+    await page.context().close();
+    Logger.info('🧹 Guest page cleaned up');
+  },
+
+  /**
+   * Staff portal guest page
+   * Use for: Staff registration/login tests
+   */
+  staffGuestPage: async ({ browser }, use) => {
+    Logger.info(`⚙️  Setting up STAFF guest page (for registration)`);
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto('/staff', { waitUntil: 'networkidle' });
+    await use(page);
+    await page.context().close();
+    Logger.info('🧹 Staff guest page cleaned up');
+  },
+
+  /**
+   * Organization portal guest page
+   * Use for: Organization registration tests
+   */
+  orgGuestPage: async ({ browser }, use) => {
+    Logger.info(`⚙️  Setting up ORGANIZATION guest page (for registration)`);
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto('/organization', { waitUntil: 'networkidle' });
+    await use(page);
+    await page.context().close();
+    Logger.info('🧹 Organization guest page cleaned up');
+  },
+
+  /**
+   * Individual portal guest page
+   * Use for: Individual registration tests
+   */
+  individualGuestPage: async ({ browser }, use) => {
+    Logger.info(`⚙️  Setting up INDIVIDUAL guest page (for registration)`);
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto('/individual', { waitUntil: 'networkidle' });
+    await use(page);
+    await page.context().close();
+    Logger.info('🧹 Individual guest page cleaned up');
+  },
+
+  /* ==================== PAGE OBJECT FIXTURES ==================== */
+
+  loginPage: async ({ guestPage }, use) => {
+    await use(new LoginPage(guestPage));
+  },
 
   programsPage: async ({ staffPage }, use) => {
     await use(new ProgramsPage(staffPage));
@@ -157,14 +254,13 @@ export const test = base.extend<Fixtures>({
 
 test.beforeEach(async ({}, testInfo) => {
   Logger.separator();
-  Logger.info(`Starting Test: ${testInfo.title}`);
+  Logger.info(`▶️  Starting Test: ${testInfo.title}`);
 });
 
 test.afterEach(async ({}, testInfo) => {
-  Logger.info(`Ending Test: ${testInfo.title}`);
+  const status = testInfo.status === 'passed' ? '✅' : '❌';
+  Logger.info(`${status} Test ${testInfo.status}: ${testInfo.title}`);
   Logger.separator();
 });
-
-/* ==================== EXPORTS ==================== */
 
 export { expect } from '@playwright/test';

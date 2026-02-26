@@ -57,6 +57,14 @@ export class SharedComponents extends BasePage {
     await this.waitForPageLoad();
   }
 
+  /* ==================== Dashboard Titles ==================== */
+
+  getDashboardTitle(dashboardText :string) :Locator {
+   return this.page.locator(`.top-title.d-display .header-subtitle:has-text("${dashboardText}")`);
+  }
+
+  
+
 /* ==================== Headder and Add New Records ==================== */
 
   getPageHeader(headerText: string): Locator {
@@ -75,11 +83,11 @@ export class SharedComponents extends BasePage {
    * These appear on: Programs, Grants, Applications, Funding Sources pages
    */
   
-  getActiveRadioButton(): Locator {
+   getActiveRadioButton(): Locator {
     return this.page.locator('input[value="Active" i]:visible').first();
   }
 
-  getInactiveRadioButton(): Locator {
+   getInactiveRadioButton(): Locator {
     return this.page.locator('input[value="Inactive" i]:visible').first();
   }
 
