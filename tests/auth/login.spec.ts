@@ -1,98 +1,113 @@
-// tests/auth/login.spec.ts
+// tests/auth/login.spec.ts - CLEANEST VERSION
 
-import { DashboardTitles } from '@enums/Enums';
 import { test, expect } from '@fixtures/AuthFixtures';
 import { Assertions } from '@utils/assertions';
 import { Logger } from '@utils/logger';
+import { NavigationHelper } from '@utils/helpers/navigationHelper';
+import { StaffLoginPage } from '@pages/auth/staff/StaffLoginPage';
+import { DashboardTitles, LoginPortalHeaders } from '@enums/Enums';
 
 test.describe('Login Tests @auth @login', () => {
 
-  test('TC-LOGIN-001: Staff Login with Valid Credentials', async ({ loginPage, guestPage }) => {
+  test('TC-LOGIN-001: Staff Login with Valid Credentials', async ({ guestPage, publicPage, portalSelectionPage }) => {
     Logger.testStart('TC-LOGIN-001: Staff Login');
 
-    await test.step('Navigate to Login Page', async () => {
-      await loginPage.gotoPublicPage();
-      await loginPage.clickOnLogin();
+    const nav = new NavigationHelper(guestPage);
+    const staffLoginPage = new StaffLoginPage(guestPage);
+
+    await test.step('Verify and Navigate to Staff Login', async () => {
+      // ✅ Verify Login button before clicking
+      await Assertions.verifyElementVisible(
+        publicPage.loginButton,
+        'Login button'
+      );
+      
+      // Navigate using publicPage
+      await publicPage.clickOnLogin();
+      
+      // ✅ Verify Staff Portal link before clicking
+      await Assertions.verifyElementVisible(
+        portalSelectionPage.staffPortalLoginLink,
+        'Staff Portal Login link'
+      );
+      
+      await portalSelectionPage.clickOnStaffPortalLoginLink();
+      
+      Logger.success('Navigated to Staff Login page');
     });
 
-    await test.step('Click Staff Portal Login', async () => {
-      await loginPage.clickOnStaffPortalLoginLink();
+    await test.step('Verify Staff Login Page', async () => {
+      const loginPortalHeader = guestPage.locator('.login100-form-title-1');
+      
+      await Assertions.verifyElementVisible(loginPortalHeader, 'Login Portal Header');
+      await Assertions.verifyElementText(
+        loginPortalHeader,
+        LoginPortalHeaders.STAFF_LOGIN_PORTAL_TITLE,
+        'Login Portal Title'
+      );
+      
+      await Assertions.verifyElementVisible(staffLoginPage.userNameField, 'Username field');
+      await Assertions.verifyElementVisible(staffLoginPage.passwordField, 'Password field');
+      await Assertions.verifyElementVisible(staffLoginPage.login, 'Login button');
     });
 
-    await test.step('Enter Credentials and Login', async () => {
-      await loginPage.staffLogin(
+    await test.step('Login with Valid Credentials', async () => {
+      await staffLoginPage.staffLogin(
         process.env.STAFF_USERNAME!,
         process.env.STAFF_PASSWORD!
       );
     });
 
     await test.step('Verify Successful Login', async () => {
-      await guestPage.waitForURL('**/dashboard');
-     // const dashboardHeader = guestPage.locator('.top-title.d-display .header-subtitle:has-text("Internal Portal")');
-     await Assertions.verifyElementVisible(loginPage.StaffDashboardHeader, 'Staff login Dashboard header');
-
-     await Assertions.verifyElementText(loginPage.StaffDashboardHeader,
-             DashboardTitles.STAFF_DASHBOARD_TITLE,
-             'Staff login Dashboard header')
+      await guestPage.waitForURL('**/dashboard', { timeout: 30000 });
+      
+      const dashboardHeader = staffLoginPage.staffDashboardHeader;
+      await Assertions.verifyElementVisible(dashboardHeader, 'Dashboard header');
+      await Assertions.verifyElementText(
+        dashboardHeader,
+        DashboardTitles.STAFF_DASHBOARD_TITLE,
+        'Dashboard title'
+      );
+      
       Logger.success('Login successful');
     });
 
     Logger.testEnd('TC-LOGIN-001');
   });
 
-  test('TC-LOGIN-002: Login with Invalid Credentials', async ({ loginPage, guestPage }) => {
+
+  test('TC-LOGIN-002: Staff Login with Invalid Credentials', async ({ guestPage }) => {
     Logger.testStart('TC-LOGIN-002: Invalid Login');
 
-    await loginPage.gotoPublicPage();
-    await loginPage.clickOnLogin();
-    await loginPage.clickOnStaffPortalLoginLink();
+    const nav = new NavigationHelper(guestPage);
+    const staffLoginPage = new StaffLoginPage(guestPage);
 
-    // ✅ Invalid credentials
-    await loginPage.staffLogin('invalid@test.com', 'WrongPassword123');
+    await test.step('Navigate to Staff Login', async () => {
+      // ✅ Using NavigationHelper - no manual verification needed inside
+      await nav.goToStaffLogin();
+      
+      // ✅ Verify we're on the login page
+      await Assertions.verifyElementVisible(
+        staffLoginPage.userNameField,
+        'Username field'
+      );
+    });
 
-    // Verify error message
-    const errorMessage = guestPage.locator('.alert-danger');
-    await expect(errorMessage).toBeVisible();
-    await expect(errorMessage).toContainText('Please Enter Your Valid Username and Password');
+    await test.step('Login with Invalid Credentials', async () => {
+      await staffLoginPage.staffLogin('invalid@test.com', 'WrongPassword123');
+    });
+
+    await test.step('Verify Error Message', async () => {
+      const errorMessage = guestPage.locator('.alert-danger');
+      
+      await Assertions.verifyElementVisible(errorMessage, 'Error message', 10000);
+      await Assertions.verifyElementContainsText(
+        errorMessage,
+        'Please Enter Your Valid Username and Password',
+        'Error message text'
+      );
+    });
 
     Logger.testEnd('TC-LOGIN-002');
   });
 });
-
-/* 
-
-## 📊 **Fixture Usage Guide:**
-
-| Test Type | Use This Fixture | Reason |
-|-----------|------------------|--------|
-| **Registration (Staff)** | `staffGuestPage` | No auth, starts at /staff |
-| **Registration (Org)** | `orgGuestPage` | No auth, starts at /organization |
-| **Registration (Individual)** | `individualGuestPage` | No auth, starts at /individual |
-| **Login Tests** | `guestPage` + `loginPage` | No auth, public homepage |
-| **Public Page Tests** | `guestPage` | No auth, public pages |
-| **Programs CRUD** | `staffPage` | Needs staff auth |
-| **Grants CRUD** | `staffPage` | Needs staff auth |
-| **Org Dashboard** | `orgPage` | Needs org auth |
-| **Individual Dashboard** | `individualPage` | Needs individual auth |
-
----
-
-## 🎯 **File Structure:**
-```
-tests/
-├── auth/
-│   ├── staff-registration.spec.ts       ✅ Uses staffGuestPage
-│   ├── organization-registration.spec.ts ✅ Uses orgGuestPage
-│   ├── individual-registration.spec.ts   ✅ Uses individualGuestPage
-│   └── login.spec.ts                     ✅ Uses guestPage + loginPage
-│
-├── programs/
-│   ├── programs-view.spec.ts             ✅ Uses staffPage (authenticated)
-│   ├── programs-add.spec.ts              ✅ Uses staffPage (authenticated)
-│   └── programs-edit.spec.ts             ✅ Uses staffPage (authenticated)
-│
-└── public/
-    ├── homepage.spec.ts                  ✅ Uses guestPage
-    └── about-page.spec.ts                ✅ Uses guestPage
-
-*/
